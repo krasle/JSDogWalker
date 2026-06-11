@@ -19,7 +19,7 @@ const VALID_SLOTS = (() => {
 
 module.exports = cds.service.impl(async function(srv) {
 
-  // ── BEFORE CREATE Appointments ──────────────────────────────────────────
+  // ── BEFORE CREATE Appointments ─────────────────────────────────────────
   srv.before('CREATE', 'Appointments', async (req) => {
     const { date, timeSlot, walker_ID } = req.data;
 
@@ -43,7 +43,7 @@ module.exports = cds.service.impl(async function(srv) {
     }
   });
 
-  // ── AFTER CREATE Appointments ────────────────────────────────────────────
+  // ── AFTER CREATE Appointments ──────────────────────────────────────────
   srv.after('CREATE', 'Appointments', async (appt) => {
     const db = await cds.connect.to('db');
 
@@ -54,7 +54,7 @@ module.exports = cds.service.impl(async function(srv) {
     const dogCount = apptDogs.length || 1;
     const fee = appt.totalFee || (30 + (dogCount - 1) * 10);
 
-    // Persist fee back to Appointment if it was not set (or was set to 0)
+    // Persist fee back to Appointment if it was not set
     if (!appt.totalFee) {
       await db.run(
         UPDATE('dog.walking.Appointments').set({ totalFee: fee }).where({ ID: appt.ID })
@@ -62,19 +62,30 @@ module.exports = cds.service.impl(async function(srv) {
     }
 
     // Auto-create a pending billing record using the computed fee
-    const newId = require('crypto').randomUUID();
     await db.run(
       INSERT.into('dog.walking.BillingRecords').entries({
-        ID:             newId,
+        ID:             require('crypto').randomUUID(),
         appointment_ID: appt.ID,
         amount:         fee,
         status:         'pending',
         issuedAt:       new Date().toISOString(),
       })
     );
+
+    // D-07 FIX: Auto-create a Confirmation record upon booking
+    await db.run(
+      INSERT.into('dog.walking.Confirmations').entries({
+        ID:             require('crypto').randomUUID(),
+        appointment_ID: appt.ID,
+        confirmedAt:    new Date().toISOString(),
+        confirmedBy:    'system',
+        method:         'email',
+        notes:          'Auto-confirmed on booking',
+      })
+    );
   });
 
-  // ── BEFORE UPDATE Appointments ───────────────────────────────────────────
+  // ── BEFORE UPDATE Appointments ─────────────────────────────────────────
   srv.before('UPDATE', 'Appointments', async (req) => {
     const { timeSlot } = req.data;
     if (timeSlot && !VALID_SLOTS.includes(timeSlot)) {
@@ -83,10 +94,10 @@ module.exports = cds.service.impl(async function(srv) {
     }
   });
 
-  // ── getValidSlots ────────────────────────────────────────────────────────
+  // ── getValidSlots ──────────────────────────────────────────────────────
   srv.on('getValidSlots', () => VALID_SLOTS);
 
-  // ── getDailySchedule ─────────────────────────────────────────────────────
+  // ── getDailySchedule ──────────────────────────────────────────────────
   srv.on('getDailySchedule', async (req) => {
     const { date } = req.data;
     if (!date) return req.reject(400, 'date parameter is required');
@@ -146,12 +157,7 @@ module.exports = cds.service.impl(async function(srv) {
     return result;
   });
 
-  // ── Helper: compute fee from appointment dog count ───────────────────────
-  srv.before(['CREATE','UPDATE'], 'AppointmentDogs', async (req) => {
-    // After dogs are added/removed, recalculate fee on the parent appointment
-    // This runs asynchronously via the after handler below
-  });
-
+  // ── AppointmentDogs: recalc fee after dog added/removed ───────────────
   srv.after(['CREATE','DELETE'], 'AppointmentDogs', async (_, req) => {
     const apptId = req.data?.appointment_ID;
     if (!apptId) return;
@@ -164,7 +170,6 @@ module.exports = cds.service.impl(async function(srv) {
     await db.run(
       UPDATE('dog.walking.Appointments').set({ totalFee: fee }).where({ ID: apptId })
     );
-    // Also update billing record amount
     await db.run(
       UPDATE('dog.walking.BillingRecords').set({ amount: fee }).where({ appointment_ID: apptId })
     );

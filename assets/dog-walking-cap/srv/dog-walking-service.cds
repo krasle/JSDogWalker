@@ -2,16 +2,16 @@ using dog.walking as dw from '../db/schema';
 
 service DogWalkingService @(path: '/api') {
 
-  entity Walkers           as projection on dw.Walkers;
+  entity Walkers            as projection on dw.Walkers;
   entity WalkerAvailability as projection on dw.WalkerAvailability;
-  entity Customers         as projection on dw.Customers;
-  entity Addresses         as projection on dw.Addresses;
-  entity Dogs              as projection on dw.Dogs;
-  entity DogFriends        as projection on dw.DogFriends;
-  entity Appointments      as projection on dw.Appointments;
-  entity AppointmentDogs   as projection on dw.AppointmentDogs;
-  entity Confirmations     as projection on dw.Confirmations;
-  entity BillingRecords    as projection on dw.BillingRecords;
+  entity Customers          as projection on dw.Customers;
+  entity Addresses          as projection on dw.Addresses;
+  entity Dogs               as projection on dw.Dogs;
+  entity DogFriends         as projection on dw.DogFriends;
+  entity Appointments       as projection on dw.Appointments;
+  entity AppointmentDogs    as projection on dw.AppointmentDogs;
+  entity Confirmations      as projection on dw.Confirmations;
+  entity BillingRecords     as projection on dw.BillingRecords;
 
   // Returns the list of valid booking time slots
   function getValidSlots() returns array of String;

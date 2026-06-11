@@ -9,12 +9,13 @@ entity Walkers : cuid {
   phone       : String(20);
   email       : String(100);
   isActive    : Boolean default true;
+  bio         : String(500);
   availability: Composition of many WalkerAvailability on availability.walker = $self;
 }
 
 entity WalkerAvailability : cuid {
   walker    : Association to Walkers not null;
-  dayOfWeek : Integer not null; // 0=Sun,1=Mon,...,6=Sat
+  dayOfWeek : Integer not null; // 1=Mon,...,7=Sun
   startTime : String(5) not null;
   endTime   : String(5) not null;
 }
@@ -26,17 +27,20 @@ entity Customers : cuid {
   lastName    : String(50) not null;
   phone       : String(20);
   email       : String(100);
+  memberSince : Date;
   addresses   : Composition of many Addresses on addresses.customer = $self;
   dogs        : Composition of many Dogs on dogs.owner = $self;
 }
 
 entity Addresses : cuid {
   customer    : Association to Customers not null;
-  type        : String(20) default 'billing'; // billing, pickup, dropoff
   street      : String(100);
   city        : String(100);
   state       : String(50);
   zip         : String(20);
+  country     : String(50);
+  isPickup    : Boolean default false;
+  isDropoff   : Boolean default false;
 }
 
 // ─── Dogs ───────────────────────────────────────────────────────────────────
@@ -52,9 +56,9 @@ entity Dogs : cuid {
   notes       : String(500);
 }
 
-entity DogFriends {
-  key dog    : Association to Dogs not null;
-  key friend : Association to Dogs not null;
+entity DogFriends : cuid {
+  dog    : Association to Dogs not null;
+  friend : Association to Dogs not null;
 }
 
 // ─── Appointments ───────────────────────────────────────────────────────────
@@ -73,9 +77,9 @@ entity Appointments : cuid, managed {
   dogs           : Composition of many AppointmentDogs on dogs.appointment = $self;
 }
 
-entity AppointmentDogs {
-  key appointment : Association to Appointments not null;
-  key dog         : Association to Dogs not null;
+entity AppointmentDogs : cuid {
+  appointment : Association to Appointments not null;
+  dog         : Association to Dogs not null;
 }
 
 // ─── Confirmations ──────────────────────────────────────────────────────────

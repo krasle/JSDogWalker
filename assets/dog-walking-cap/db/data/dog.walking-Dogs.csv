@@ -1,76 +1,81 @@
 ID,owner_ID,name,breed,weight,color,dateOfBirth,licenseNo,notes
-d001,c001,Buddy,Golden Retriever,30.5,Golden,2020-03-15,LIC001,Loves fetch
-d002,c001,Luna,Labrador,28.0,Black,2021-06-20,LIC002,Very friendly
-d003,c002,Max,German Shepherd,35.0,Black and Tan,2019-11-10,LIC003,Well trained
-d004,c003,Bella,Poodle,12.0,White,2022-01-05,LIC004,Hypoallergenic
-d005,c003,Charlie,Beagle,14.0,Tricolor,2021-09-18,LIC005,Loves sniffing
-d006,c004,Daisy,Bulldog,25.0,Brindle,2020-07-22,LIC006,Snores loudly
-d007,c005,Rocky,Rottweiler,40.0,Black,2019-04-30,LIC007,Gentle giant
-d008,c005,Molly,Cocker Spaniel,12.5,Brown,2022-02-14,LIC008,Very playful
-d009,c005,Coco,Shih Tzu,6.0,White,2023-01-01,LIC009,Likes bows
-d010,c006,Bear,Husky,28.0,Gray,2020-12-25,LIC010,Pulls on leash
-d011,c007,Lola,Dachshund,8.0,Brown,2021-05-10,LIC011,Short legs big heart
-d012,c007,Sadie,Yorkshire Terrier,3.5,Tan,2022-08-30,LIC012,Very vocal
-d013,c008,Milo,Boxer,30.0,Fawn,2020-10-10,LIC013,Bouncy
-d014,c009,Rosie,Cavalier King Charles,8.0,Ruby,2021-03-22,LIC014,Gentle
-d015,c010,Zeus,Great Dane,65.0,Blue,2019-08-15,LIC015,Huge but sweet
-d016,c010,Nala,Maltese,4.0,White,2023-03-10,LIC016,Princess
-d017,c011,Biscuit,Border Collie,18.0,Black and White,2020-06-01,LIC017,Very smart
-d018,c012,Pepper,Jack Russell,7.0,White,2022-04-15,LIC018,High energy
-d019,c013,Duke,Doberman,38.0,Black,2019-09-20,LIC019,Loyal
-d020,c014,Ginger,Irish Setter,28.0,Red,2021-01-10,LIC020,Beautiful coat
-d021,c015,Bruno,Saint Bernard,70.0,Brown and White,2020-05-05,LIC021,Drools a lot
-d022,c016,Chloe,Miniature Schnauzer,7.5,Salt and Pepper,2022-07-20,LIC022,Always alert
-d023,c017,Archie,Welsh Corgi,12.0,Sable,2021-11-15,LIC023,Happy ears
-d024,c018,Stella,Australian Shepherd,22.0,Blue Merle,2020-09-01,LIC024,Herds everything
-d025,c019,Oliver,French Bulldog,12.0,Brindle,2022-05-25,LIC025,Snorts cutely
-d026,c020,Ruby,Dalmatian,25.0,White with Black Spots,2020-02-28,LIC026,Fast runner
-d027,c021,Cooper,Labradoodle,20.0,Golden,2021-08-12,LIC027,Fluffy
-d028,c022,Penny,Pomeranian,3.0,Orange,2023-02-14,LIC028,Tiny and fluffy
-d029,c023,Jasper,English Bulldog,25.0,White,2020-11-08,LIC029,Stubborn
-d030,c024,Willow,Siberian Husky,25.0,White,2021-04-20,LIC030,Escape artist
-d031,c025,Teddy,Goldendoodle,22.0,Cream,2022-06-15,LIC031,Non-shedding
-d032,c026,Gracie,Basset Hound,25.0,Tricolor,2020-08-30,LIC032,Long ears
-d033,c027,Diesel,Pit Bull,32.0,Gray,2019-12-12,LIC033,Very gentle
-d034,c028,Peaches,Bichon Frise,6.0,White,2022-09-05,LIC034,Fluffy cloud
-d035,c029,Rex,Labrador,32.0,Yellow,2020-01-18,LIC035,Ball obsessed
-d036,c030,Ivy,Vizsla,22.0,Rust,2021-07-07,LIC036,Athletic
-d037,c031,Ace,German Shorthaired Pointer,28.0,Liver,2020-04-22,LIC037,Bird dog
-d038,c032,Cookie,Maltipoo,5.0,Apricot,2023-04-01,LIC038,Sweet
-d039,c033,Maverick,Belgian Malinois,30.0,Fawn,2019-10-15,LIC039,Intense
-d040,c034,Hazel,Cavalier King Charles,7.5,Blenheim,2022-03-10,LIC040,Cuddly
-d041,c035,Hugo,Newfoundland,65.0,Black,2020-07-04,LIC041,Giant teddy
-d042,c036,Pixie,Chihuahua,2.5,Brown,2022-11-20,LIC042,Tiny but fierce
-d043,c037,Scout,English Springer Spaniel,22.0,Liver and White,2021-06-28,LIC043,Gun dog
-d044,c038,Bentley,Weimaraner,32.0,Silver,2020-03-03,LIC044,Ghost dog
-d045,c039,Piper,Miniature Pinscher,5.0,Black and Tan,2022-08-10,LIC045,Little Dobie
-d046,c040,Moose,Bernese Mountain Dog,48.0,Tricolor,2020-10-31,LIC046,Gentle
-d047,c041,Remi,Samoyed,25.0,White,2021-12-25,LIC047,Smiling dog
-d048,c042,Olive,Shiba Inu,10.0,Red,2022-02-22,LIC048,Independent
-d049,c043,Gunner,Alaskan Malamute,42.0,Gray,2019-11-30,LIC049,Howler
-d050,c044,Poppy,Cocker Spaniel,12.0,Golden,2021-10-10,LIC050,Sweet eyes
-d051,c045,Major,Belgian Malinois,32.0,Fawn,2020-06-15,LIC051,Police trained
-d052,c046,Bambi,Whippet,12.0,Fawn,2022-05-01,LIC052,Fast runner
-d053,c047,Winston,Bloodhound,45.0,Red,2019-08-08,LIC053,Master tracker
-d054,c048,Clover,Irish Wolfhound,60.0,Gray,2020-09-20,LIC054,Tallest dog
-d055,c049,Kodiak,Akita,40.0,Red,2021-02-18,LIC055,Dignified
-d056,c050,Peanut,Toy Poodle,3.0,Apricot,2023-06-01,LIC056,Smart as a whip
-d057,c001,Rusty,Beagle,13.0,Tricolor,2022-10-10,LIC057,Third dog
-d058,c003,Pip,Miniature Schnauzer,7.0,Black,2023-02-01,LIC058,New addition
-d059,c005,Ziggy,Dachshund,9.0,Red,2021-07-15,LIC059,Fourth dog c005
-d060,c007,Biscotti,Maltese,4.5,White,2023-05-10,LIC060,Third dog c007
-d061,c010,Titan,Akita,38.0,Brindle,2020-11-11,LIC061,Third dog c010
-d062,c015,Duchess,Poodle,14.0,Silver,2021-04-04,LIC062,Second dog c015
-d063,c018,Nova,Blue Heeler,16.0,Blue Speckled,2022-01-20,LIC063,Second dog c018
-d064,c020,Rosco,Basset Hound,26.0,Tricolor,2021-09-09,LIC064,Second dog c020
-d065,c022,Buttons,Shih Tzu,6.5,Black and White,2022-12-12,LIC065,Second dog c022
-d066,c025,Maple,Border Collie,17.0,Black and White,2021-03-03,LIC066,Second dog c025
-d067,c028,Truffle,Miniature Schnauzer,7.0,Salt and Pepper,2023-01-15,LIC067,Second dog c028
-d068,c030,Fern,Golden Retriever,28.0,Golden,2021-08-25,LIC068,Second dog c030
-d069,c033,Storm,Husky,26.0,Black and White,2020-05-20,LIC069,Second dog c033
-d070,c035,Cosmo,Labrador,30.0,Chocolate,2022-04-10,LIC070,Second dog c035
-d071,c038,Pearl,Pomeranian,2.5,Cream,2023-03-20,LIC071,Second dog c038
-d072,c040,Ranger,German Shepherd,36.0,Sable,2021-11-05,LIC072,Second dog c040
-d073,c043,Chief,Rottweiler,42.0,Black and Tan,2020-07-14,LIC073,Second dog c043
-d074,c046,Misty,Cocker Spaniel,11.0,Black,2022-08-08,LIC074,Second dog c046
-d075,c050,Noodle,Chinese Crested,5.0,Spotted,2023-04-15,LIC075,Second dog c050
+6114e615-d2a5-477d-b13a-497d72c7a2f6,61921f30-75e2-4fc5-aff0-0a060b20aeb1,Ruby,Beagle,14,black,2020-02-02,LIC-92399,
+ede1b620-63c5-4ca3-90d8-18fd8d6deb37,53fb7e9d-4338-479e-90f4-3b1f1899c2e6,Toby,Labrador,10,tan,2021-04-05,LIC-67217,
+56f50e57-6a46-4ead-a941-b459dff2de2a,3d429b80-bea6-4166-88b5-abaa8988e7f0,Rosie,Beagle,49,grey,2017-09-11,LIC-32417,
+ad0e28c7-3edd-45b9-92b5-6818d25a907a,34a9dd8d-79d1-4075-99d6-62c90cbd193c,Sadie,Great Dane,16,red,2019-05-22,LIC-10415,
+e046f3f9-fcf0-4992-a5be-d0af4bacf3b9,5602ea69-4697-4453-b9e5-773d206339f5,Murphy,Rottweiler,11,brindle,2017-01-02,LIC-89513,
+4d56093f-1a0c-4bf5-8cc7-4dc187492324,5291b8f1-33b3-4bbf-89d4-a37bdaee4dd0,Luna,Dachshund,46,golden,2016-08-09,LIC-25743,
+61b10704-6d04-4d9e-869e-a2d29c8baf82,46bf9ead-138e-4ab0-a0ac-da77bb47831a,Charlie,German Shepherd,15,cream,2022-02-01,LIC-52270,
+ef07a207-2f30-400f-a9c3-89e8dccf1a2d,2a1c8f4c-106d-45d6-9d3f-e15ed162b0bf,Ruby,Siberian Husky,20,tan,2017-12-07,LIC-25006,
+fb8b9dfb-d3a7-4a7d-9aa3-2ce4f06c1e8c,fc7cea60-f857-4e61-b0c0-472af3f5a752,Rocky,Bulldog,5,brindle,2020-06-19,LIC-33954,
+f28f7f20-c12f-4dc7-bb08-84f635ccaced,03462573-52c9-4ba0-ac3c-0040bfacd345,Duke,Great Dane,50,spotted,2015-12-04,LIC-60344,
+746bdc8c-7db9-44d0-940c-8a9ee253bf91,c973261d-1cb4-42d6-91b0-b9850e0b3ffa,Leo,Golden Retriever,19,red,2020-07-13,LIC-51955,
+bace65b1-85d3-4385-806e-49792ac988a7,e881aa0b-50ae-4fef-a8bf-f3c91cddca83,Sadie,German Shepherd,21,brown,2022-06-14,LIC-60636,
+c5d03354-c2c8-415e-adc3-9be5dfce9cda,d1f47ad8-bbfe-4446-b8c5-ce8fcc68b90b,Lily,French Bulldog,49,black,2019-01-02,LIC-26156,
+dbb6e1c3-e68a-40b2-88f8-4a77cfa08a6b,1610c02b-3b96-4808-9194-a88f81e325c3,Luna,Great Dane,47,brindle,2015-05-11,LIC-32345,
+fb6ff67a-fc55-4988-9c8f-8959ff68e12e,8b9d3459-e0e5-4d7e-993b-db98f2a00f0d,Coco,Chihuahua,31,black,2021-06-02,LIC-52821,
+ae60d942-960e-400e-9cdc-5b0722c010f8,669bcb4c-1065-4fe5-9cfa-73d84fa4409c,Harley,Yorkshire Terrier,15,grey,2021-03-14,LIC-83209,
+5aed653c-0974-4b37-ac85-97198594ac91,eee5c44e-416d-4b26-a4a7-3b821f31d501,Sadie,Great Dane,12,brindle,2017-02-10,LIC-46448,
+3d1608b4-cf0d-4fd8-94e4-b3b95cad64e7,1698e9ba-34cd-42a2-af90-2eec9c0ca1c0,Luna,Yorkshire Terrier,13,cream,2019-07-25,LIC-64471,
+47319365-4216-40a5-9f7c-bf1173c2e84a,1a663ddb-6cb8-4ed6-adf3-775274723860,Oliver,Yorkshire Terrier,8,golden,2022-12-24,LIC-87831,
+e0212a88-398c-41a5-a714-1f8d4d97f711,a22b627e-9852-4dcb-9966-56a27f13c1aa,Ruby,Golden Retriever,46,white,2015-10-02,LIC-97823,
+cbcc4699-99ef-42eb-8c3b-b01b5c560b8c,51df71e8-312c-4a66-9eb9-fbc805047796,Buddy,Rottweiler,6,brindle,2018-11-18,LIC-39837,
+1b4e46ae-54b5-471f-90b7-cd5ef933db70,51df71e8-312c-4a66-9eb9-fbc805047796,Penny,French Bulldog,15,spotted,2017-07-02,LIC-19317,
+4d9a2ca6-2650-4545-b4cc-eeb272d5bce4,8f68523e-071d-48ac-80d1-b3742bf9fb4a,Sadie,French Bulldog,42,brindle,2022-05-11,LIC-88084,
+2ef89d07-4c2d-410f-b662-8bdb409fcaca,8f68523e-071d-48ac-80d1-b3742bf9fb4a,Coco,Labrador,22,red,2016-01-07,LIC-32222,
+ae772814-f1fd-4517-8062-d8d25cbb7b66,46a09393-d775-49f5-b6c7-63bf3d01dc76,Milo,Golden Retriever,15,brindle,2022-08-25,LIC-14775,
+7b00c070-85bb-4929-92c0-40046f1e8855,46a09393-d775-49f5-b6c7-63bf3d01dc76,Luna,Boxer,22,tan,2015-05-06,LIC-53005,
+972b37a8-a6ca-42c6-bd64-dd3ba7ec00e0,c0f1aef4-fec3-46e5-807c-862576b2e0e1,Duke,Yorkshire Terrier,19,tan,2017-12-01,LIC-61312,
+66580f13-d7b8-4d06-8076-5cc1b6592fbe,c0f1aef4-fec3-46e5-807c-862576b2e0e1,Murphy,Siberian Husky,10,grey,2022-10-28,LIC-29235,
+d7fbd259-6ab5-423f-99e2-7a29789cb2c6,6743735a-f866-4a74-a24d-17bce48fd5df,Sophie,Labrador,48,spotted,2019-07-02,LIC-65706,
+7df5260e-ac48-45fc-be66-a68b23b4168a,6743735a-f866-4a74-a24d-17bce48fd5df,Bentley,Boxer,29,cream,2017-06-24,LIC-24103,
+1bbf741d-6517-4dcf-9825-3b6baa0177a6,923c55e8-8409-40fd-b46e-f098691c560d,Stella,Bulldog,35,spotted,2017-02-13,LIC-40779,
+43c63ea7-83ce-49df-96a6-815df9d74769,923c55e8-8409-40fd-b46e-f098691c560d,Oliver,Yorkshire Terrier,48,red,2016-07-25,LIC-52463,
+a88de1a9-e379-41a5-94dd-532502328ace,8437853a-f91f-49ca-8eb0-58b223640e06,Lily,Poodle,44,brindle,2016-07-02,LIC-72539,
+7e18015f-c3e7-4642-ae2a-a8a4adf703b7,8437853a-f91f-49ca-8eb0-58b223640e06,Daisy,Poodle,5,tan,2019-11-01,LIC-23382,
+2a06b69c-caa7-4077-a769-be4483f9d8ed,43d0d356-e83b-47d7-b461-4f8677ac7f49,Bear,Labrador,6,white,2017-10-10,LIC-89407,
+8a4cf119-9c49-4d0d-9229-5e1817e596c9,43d0d356-e83b-47d7-b461-4f8677ac7f49,Ellie,Beagle,34,spotted,2016-09-27,LIC-16871,
+0aea1043-2ea1-4a4c-baba-5922f2e59654,de24a4e7-7b77-4f79-9770-04ee647bbfff,Oliver,French Bulldog,21,brown,2018-01-23,LIC-95653,
+eef26806-ae9b-44d0-b734-43fae3e1dc0e,de24a4e7-7b77-4f79-9770-04ee647bbfff,Harley,Bulldog,43,cream,2016-05-04,LIC-52903,
+153466a4-62af-41fd-b0e7-0d36d92047b7,ea9b3175-c2c4-4752-82d5-b1a213753caa,Luna,Bulldog,49,black,2020-08-12,LIC-70674,
+1168c12d-e695-4bbb-a6b0-a4f202cbb0f0,ea9b3175-c2c4-4752-82d5-b1a213753caa,Beau,Boxer,34,brindle,2017-11-05,LIC-61750,
+d0aa7f4f-1872-4e58-a746-d5a481335d41,5edecd6c-e1e2-45d7-ba97-3bf29148a562,Buddy,Beagle,14,golden,2019-09-11,LIC-33770,
+9f38743b-866b-4971-9a5c-0426468e7471,5edecd6c-e1e2-45d7-ba97-3bf29148a562,Luna,Chihuahua,5,tan,2021-09-01,LIC-63338,
+511e87d0-5213-4582-b0f6-b0cac9896048,b95151c9-e117-492c-9c6f-c37227f956d5,Toby,Golden Retriever,43,cream,2017-04-23,LIC-45779,
+21a6708f-2aef-4e6b-b698-ef0d60febc99,b95151c9-e117-492c-9c6f-c37227f956d5,Milo,Great Dane,26,grey,2022-06-10,LIC-31979,
+6cdae27e-6166-4c78-9971-69ea74d8a7e6,a87065ff-33d1-4e67-8d6b-1d95b8b5c64b,Bella,Rottweiler,30,black,2020-05-05,LIC-33596,
+cc6b955b-ceda-4a85-aba8-e80e3e271bfa,a87065ff-33d1-4e67-8d6b-1d95b8b5c64b,Gracie,Poodle,44,grey,2020-01-20,LIC-89354,
+0e404f15-eeae-4718-99c7-bc3773a9a6ea,3dd609b2-ca2f-4da4-be0a-7c8fae894765,Harley,Dachshund,30,brown,2018-10-08,LIC-28523,
+688b2056-b8e8-4900-b05b-4f31b748db10,3dd609b2-ca2f-4da4-be0a-7c8fae894765,Lucy,Bulldog,42,brown,2020-06-12,LIC-36230,
+665cbe00-282a-4573-bfa7-73871105d4b8,8aed77b1-bcf0-4211-aec6-037a62a416f4,Luna,Labrador,39,golden,2022-02-09,LIC-61695,
+28303b1c-110b-4b0a-839d-a8edf2d684c7,8aed77b1-bcf0-4211-aec6-037a62a416f4,Cody,Yorkshire Terrier,20,white,2015-08-03,LIC-29658,
+bc47bc2d-2c0d-45c4-b435-a50e8f1cd179,c912edab-d764-4409-9f32-8ea605b2e6c3,Maggie,Rottweiler,37,brown,2018-09-15,LIC-24470,
+616d4702-5f97-4221-a36b-24971c7da32d,c912edab-d764-4409-9f32-8ea605b2e6c3,Duke,French Bulldog,18,tan,2016-05-15,LIC-64899,
+57224918-8fa5-40f3-ba72-587c9e768b25,cafc015c-ada5-42b5-b359-b4d80a7f34d8,Murphy,Dachshund,37,brindle,2022-06-03,LIC-88050,
+8f4aee94-cfb4-45b5-9fd8-19d4bb26ae47,cafc015c-ada5-42b5-b359-b4d80a7f34d8,Luna,Bulldog,23,brindle,2016-12-01,LIC-17535,
+a88b6ecd-3eb5-43c0-8157-6cc2c762148f,6090e415-ca12-4455-8f66-3166d484661a,Molly,Labrador,13,grey,2020-01-22,LIC-33189,
+79b7029a-4337-4964-944f-cf0d3d6b579f,6090e415-ca12-4455-8f66-3166d484661a,Beau,Golden Retriever,27,tan,2015-03-16,LIC-35941,
+3ebeb0cb-df19-4748-a2b3-4be61f12791c,a1741101-9b52-4724-85d3-72d27a051e87,Ruby,Poodle,14,brindle,2022-01-09,LIC-87919,
+b28bbdd5-8d45-40aa-9b6d-e9f9e446fac0,a1741101-9b52-4724-85d3-72d27a051e87,Cody,French Bulldog,31,spotted,2020-03-25,LIC-25074,
+b50c7370-e140-47ad-8284-78b92abd5752,8f7b3560-2277-4cd8-9378-5f2d49fe8cbd,Ruby,Beagle,21,black,2017-10-27,LIC-38531,
+f5b56da5-9dec-4909-8840-a02e7f2fde38,8f7b3560-2277-4cd8-9378-5f2d49fe8cbd,Chloe,Dachshund,33,grey,2018-02-02,LIC-30854,
+9f33b3fa-0a0c-497f-b924-722cbbf9f13b,6c14505a-8131-47e9-9e97-c17134d5837b,Bentley,Yorkshire Terrier,14,cream,2020-08-24,LIC-29459,
+425531cb-061a-4663-a691-e1c4b4729eaf,6c14505a-8131-47e9-9e97-c17134d5837b,Sadie,Yorkshire Terrier,40,tan,2016-09-21,LIC-79184,
+9efe407f-1090-488c-8445-f7e1578f0772,6c14505a-8131-47e9-9e97-c17134d5837b,Coco,Poodle,40,white,2021-02-26,LIC-71527,
+df41b9e5-be40-4988-a226-e1aa4def0feb,6c14505a-8131-47e9-9e97-c17134d5837b,Leo,Labrador,48,golden,2022-04-16,LIC-95627,
+0671fcf7-c92f-45b4-a524-f94496364510,c6a9572a-dc97-46eb-b6af-71acd2929586,Toby,Poodle,22,brown,2020-03-07,LIC-78280,
+e40c7b07-8998-4852-9863-9789ff8a3997,c6a9572a-dc97-46eb-b6af-71acd2929586,Tucker,Poodle,6,spotted,2021-03-14,LIC-44049,
+73eda16c-a336-4329-a9a7-d4fe13431199,c6a9572a-dc97-46eb-b6af-71acd2929586,Zoe,Dachshund,50,black,2016-04-28,LIC-19164,
+56685457-7a03-46fd-bf19-3c7fc5fc9bce,c6a9572a-dc97-46eb-b6af-71acd2929586,Coco,Rottweiler,46,tan,2015-11-02,LIC-27350,
+b5ebc450-06bb-4a95-8873-3a8471d3ec1f,32fc312e-99cf-4600-a830-2f42e8255820,Coco,German Shepherd,14,cream,2015-05-17,LIC-41915,
+05d89310-a00f-4b83-bcd6-aa69d8bf18c4,b4f222ff-5daa-4b9d-b87a-8b5ea8000634,Lily,Yorkshire Terrier,49,brindle,2017-02-27,LIC-82416,
+4f19805e-ef81-456f-9f43-6108d18a8fe0,b4f222ff-5daa-4b9d-b87a-8b5ea8000634,Ruby,Labrador,20,grey,2016-12-12,LIC-78925,
+f1bb3b27-b95b-40b0-9cf2-659e69d932bd,b4f222ff-5daa-4b9d-b87a-8b5ea8000634,Beau,French Bulldog,13,red,2021-08-04,LIC-84769,
+35f7c7eb-edad-4818-8602-52b66cf00e8e,b4f222ff-5daa-4b9d-b87a-8b5ea8000634,Chloe,Beagle,10,white,2016-12-08,LIC-28926,
+c7a5eb4b-f659-4ef5-b3d8-4fbba2618828,b4f222ff-5daa-4b9d-b87a-8b5ea8000634,Lola,Labrador,12,grey,2017-09-04,LIC-73609,
+d313cf8e-14ff-4c4a-b5e5-f9db614f784c,70ca88f2-96b6-4b27-a37c-87a20ee775e7,Tucker,Poodle,21,cream,2016-10-20,LIC-30121,
+179ca330-36d4-4856-9f65-6a021a9713c6,70ca88f2-96b6-4b27-a37c-87a20ee775e7,Nala,Labrador,7,tan,2021-12-11,LIC-56164,
+4ddfb12a-73b7-4a4c-97fc-758be48c32ef,70ca88f2-96b6-4b27-a37c-87a20ee775e7,Beau,Siberian Husky,16,grey,2018-05-17,LIC-90096,
+030a5140-409b-46aa-bc23-3f3294baa9cb,7621bef3-46f9-48f6-9e14-a9a5d3f28f0d,Sophie,Beagle,34,white,2022-03-05,LIC-72599,
+0fb41f8c-36b1-468b-859c-511be0e26a9a,e5af7237-1c17-4071-89ba-e44cf5dafc1d,Murphy,Bulldog,19,black,2021-01-18,LIC-73630,
+02eef5d5-9244-43b3-9935-7dbda3372d4c,e5af7237-1c17-4071-89ba-e44cf5dafc1d,Nala,Beagle,24,black,2015-09-19,LIC-94071,

@@ -1,13 +1,21 @@
 ID,appointment_ID,confirmedAt,confirmedBy,method,notes
-cf001,ap001,2026-06-14T09:00:00Z,Alice Thompson,email,Confirmed via email
-cf002,ap002,2026-06-14T10:00:00Z,Bob Williams,sms,Confirmed via text
-cf003,ap048,2026-06-18T08:00:00Z,Alice Thompson,phone,Phone confirmation
-cf004,ap049,2026-06-18T08:30:00Z,Bob Williams,email,Email confirmation
-cf005,ap050,2026-06-18T09:00:00Z,Carol Martinez,email,Auto confirm
-cf006,ap051,2026-06-18T09:15:00Z,David Johnson,sms,Text confirm
-cf007,ap052,2026-06-18T09:30:00Z,Emma Brown,email,Email confirm
-cf008,ap053,2026-06-18T09:45:00Z,Frank Garcia,phone,Phone confirm
-cf009,ap054,2026-06-18T10:00:00Z,Grace Lee,email,Email confirm
-cf010,ap055,2026-06-18T10:15:00Z,Henry Wilson,sms,Text confirm
-cf011,ap056,2026-06-18T10:30:00Z,Iris Moore,email,Email confirm
-cf012,ap057,2026-06-18T10:45:00Z,Jack Taylor,email,Email confirm
+ec9be777-b776-4fb4-93c8-7047c31f7067,23a8bdb2-490a-451f-a005-0f746d29ff21,2026-12-20T07:30:00Z,system,phone,Auto-confirmed
+67316bf9-2b1f-4a34-89d4-1033cb30168e,14b37b1f-6751-4948-9467-6047acd8292f,2026-05-11T07:30:00Z,system,email,Auto-confirmed
+837d8f87-921e-4165-97c0-c66c19501aa4,94353470-364f-44d4-91cb-a169e81ea03c,2026-09-04T07:30:00Z,system,email,Auto-confirmed
+7385c809-c4ec-40aa-9114-bd76f759ee5a,c5a1e8e2-8405-4cf0-abba-c5c9cb7ebc7f,2026-03-24T07:30:00Z,system,email,Auto-confirmed
+a3671928-9e77-431d-8411-f690bf91ebc3,e124a125-bde5-418e-ac5a-66650de34901,2026-10-06T07:30:00Z,system,email,Auto-confirmed
+b0dc5b36-f597-4a66-86e8-5b705344cd5d,cd098cfa-fc51-429f-8a20-2f12305f8a1c,2026-07-08T07:30:00Z,system,phone,Auto-confirmed
+f4134a80-4eb1-417f-9e89-3ca04c931443,b887907e-395e-4c17-a569-61b4ad35d1cd,2026-02-16T07:30:00Z,system,email,Auto-confirmed
+d8e552c0-1176-433b-b694-2eaf4be86246,24cd34df-98c4-44a0-8a47-0cd935a6ac25,2026-11-26T07:30:00Z,system,sms,Auto-confirmed
+5ac6af71-8af0-4672-b245-0e414230278e,5f65e54f-b641-46e9-85a1-5e865889bcc4,2026-11-26T07:30:00Z,system,sms,Auto-confirmed
+ec802202-23f4-49b3-8b33-adda68824294,2e0d671b-e812-4671-bb87-c04a0dd55b23,2026-06-25T07:30:00Z,system,sms,Auto-confirmed
+c4f870b1-8f7f-4f6a-8a4c-a25070bc786c,a3324967-d4e2-4b25-99f6-1b6f523b51d3,2026-11-07T07:30:00Z,system,phone,Auto-confirmed
+b742f935-c9d0-433a-a3d3-84fb834c845e,1171151e-451e-4e83-84d4-67b691fe9005,2026-08-22T07:30:00Z,system,email,Auto-confirmed
+f805489b-1fa9-403a-b7f1-edf99521830e,b2f78f01-ad88-4554-aad1-fe9fc5efeeb9,2026-11-03T07:30:00Z,system,phone,Auto-confirmed
+5ca73db9-f28d-47c5-8832-80fa81e159ac,2a5c5776-0a6d-4b63-82d0-22319f12353f,2026-02-17T07:30:00Z,system,sms,Auto-confirmed
+e82f2455-a865-4f41-b741-170fd07bee4e,73917eea-664e-4818-927c-aa244c458db5,2026-02-14T07:30:00Z,system,phone,Auto-confirmed
+49e97ee5-d96b-4ef8-860a-69bbea12c56c,618469e1-1931-4efa-9e2f-6c8dd8be3576,2026-04-22T07:30:00Z,system,email,Auto-confirmed
+d351308a-fd52-4cf1-b7c1-fc9b89be07fe,aef8a9b4-b2fb-45c7-bdd6-c43b4f98012a,2026-03-10T07:30:00Z,system,email,Auto-confirmed
+fa8eea60-388a-405a-ba58-89eb8e484dc6,911b3fc5-f098-45df-b1ff-4afeb9af458a,2026-11-15T07:30:00Z,system,phone,Auto-confirmed
+8bc78d9f-d3d9-4dcb-a681-395739aafc40,c66cebf9-0077-428f-ada1-06400c479224,2026-06-11T07:30:00Z,system,phone,Auto-confirmed
+bdc07f4c-834b-4f83-b271-1e616f645510,3ec8fb20-94db-436c-aebd-94d0073ba612,2026-04-11T07:30:00Z,system,email,Auto-confirmed

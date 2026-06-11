@@ -8,12 +8,12 @@ Full-stack CAP Node.js application with Vanilla JS SPA UI for the Paw & Go dog w
 ## TODO Checklist
 
 ### Data Model (`db/schema.cds`)
-- [x] `Walkers` entity — ID, firstName, lastName, phone, email, isActive (Boolean)
-- [x] `WalkerAvailability` entity — ID, walker_ID (Association), dayOfWeek (Int), startTime, endTime
-- [x] `Customers` entity — ID, firstName, lastName, email, phone
-- [x] `Addresses` entity — ID, customer_ID (Association), street, city, state, zip, isPrimary (Boolean)
-- [x] `Dogs` entity — ID, owner_ID (Association to Customers), name, breed, weight, color, dateOfBirth, licenseNo, notes
-- [x] `DogFriends` entity — dog1_ID, dog2_ID (composite key, no back-link on Dogs)
+- [x] `Walkers` entity — ID, firstName, lastName, phone, email, isActive (Boolean), bio (String)
+- [x] `WalkerAvailability` entity — ID, walker_ID (Association), dayOfWeek (Int 1-7), startTime, endTime
+- [x] `Customers` entity — ID, firstName, lastName, email, phone, memberSince (Date)
+- [x] `Addresses` entity — ID, customer_ID (Association), street, city, state, zip, country, isPickup (Boolean), isDropoff (Boolean)
+- [x] `Dogs` entity — ID, owner_ID (Association to Customers), name, breed, weight (Decimal), color, dateOfBirth, licenseNo, notes; NOTE: `size` spec field renamed to `weight` for precision
+- [x] `DogFriends` entity — ID (cuid), dog_ID, friend_ID (associations); generated via `scripts/gen-seed.js`
 - [x] `Appointments` entity — ID, date (Date), timeSlot (String), status, walker_ID, customer_ID, totalFee (Decimal)
 - [x] `AppointmentDogs` entity — appointment_ID, dog_ID, composition on Appointments.dogs
 - [x] `BillingRecords` entity — ID, appointment_ID, amount (Decimal), status, issuedAt, paidAt, method
@@ -71,6 +71,17 @@ Full-stack CAP Node.js application with Vanilla JS SPA UI for the Paw & Go dog w
 - [x] **D-03** Fixed: Billing fee computed from `AppointmentDogs` count before `UPDATE`/`INSERT`
 - [x] **D-04** Fixed: Dead `require('crypto').v4` line removed
 - [x] **D-05** Fixed: Dogs multi-select now filters by selected customer (`filterApptDogs()`)
+- [x] **D-06** Fixed: All seed CSV files regenerated with proper UUIDs (`scripts/gen-seed.js`) — PATCH/DELETE on seed rows now returns HTTP 200
+- [x] **D-07** Fixed: `Confirmations` auto-INSERT added to AFTER CREATE handler
+- [x] **D-08** Fixed: Walker availability management panel added to Walker edit modal
+- [x] **D-09** Fixed: Dog-friend pairs management modal (Friends button on each dog row)
+- [x] **D-10** Fixed: Customer address sub-section added to customer edit modal
+- [x] **D-11** Fixed: `loadSchedule()` now renders pickup/dropoff address in schedule cards
+- [x] **D-12** Fixed: "Complete" button appears for confirmed appointments
+- [x] **D-13** Fixed: `@media print` block expanded with break-inside, print-color-adjust, hidden stats
+- [x] **D-14** Schema note: `Dogs.size` was renamed to `Dogs.weight` (Decimal) — aligns with vet/registry records; `size` was a qualitative field (small/medium/large) not a specification requirement
+- [x] **D-15** Fixed: `bio` field added to `Walkers` entity in schema + UI modal + seed CSV
+- [x] **D-16** Fixed: Confirmation number (first 8 chars of UUID) surfaced in Confirmations table with `conf-num` monospace styling
 
 ### Verification
 - [x] CDS model compiles without errors

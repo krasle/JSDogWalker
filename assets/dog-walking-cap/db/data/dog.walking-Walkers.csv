@@ -1,6 +1,6 @@
-ID,firstName,lastName,phone,email,isActive
-w001,Jake,Morrison,555-0101,jake.morrison@pawgo.com,true
-w002,Sofia,Chen,555-0102,sofia.chen@pawgo.com,true
-w003,Marcus,Davis,555-0103,marcus.davis@pawgo.com,true
-w004,Priya,Patel,555-0104,priya.patel@pawgo.com,true
-w005,Lucas,Rivera,555-0105,lucas.rivera@pawgo.com,true
+ID,firstName,lastName,phone,email,isActive,bio
+6a18c589-08ba-43e1-b1cb-7e8b4479a443,Alice,Barker,555-4115,alice@pawandgo.com,true,Experienced dog walker and pet lover.
+21df18d7-1132-475e-8956-f51d67b60b45,Ben,Shepherd,555-6239,ben@pawandgo.com,true,Experienced dog walker and pet lover.
+c452d8c3-d881-40be-b27d-7fdc16f0534e,Clara,Wolff,555-3258,clara@pawandgo.com,true,Experienced dog walker and pet lover.
+29f4c9f3-dd15-48de-8067-39d906fb9665,Diego,Hunt,555-9712,diego@pawandgo.com,true,Experienced dog walker and pet lover.
+2bb6a15c-314f-4bb8-ad29-40fa92b46e83,Elena,Parks,555-2513,elena@pawandgo.com,true,Experienced dog walker and pet lover.
