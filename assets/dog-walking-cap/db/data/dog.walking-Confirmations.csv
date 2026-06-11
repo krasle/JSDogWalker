@@ -1,0 +1,13 @@
+ID,appointment_ID,confirmedAt,confirmedBy,method,notes
+cf001,ap001,2026-06-14T09:00:00Z,Alice Thompson,email,Confirmed via email
+cf002,ap002,2026-06-14T10:00:00Z,Bob Williams,sms,Confirmed via text
+cf003,ap048,2026-06-18T08:00:00Z,Alice Thompson,phone,Phone confirmation
+cf004,ap049,2026-06-18T08:30:00Z,Bob Williams,email,Email confirmation
+cf005,ap050,2026-06-18T09:00:00Z,Carol Martinez,email,Auto confirm
+cf006,ap051,2026-06-18T09:15:00Z,David Johnson,sms,Text confirm
+cf007,ap052,2026-06-18T09:30:00Z,Emma Brown,email,Email confirm
+cf008,ap053,2026-06-18T09:45:00Z,Frank Garcia,phone,Phone confirm
+cf009,ap054,2026-06-18T10:00:00Z,Grace Lee,email,Email confirm
+cf010,ap055,2026-06-18T10:15:00Z,Henry Wilson,sms,Text confirm
+cf011,ap056,2026-06-18T10:30:00Z,Iris Moore,email,Email confirm
+cf012,ap057,2026-06-18T10:45:00Z,Jack Taylor,email,Email confirm

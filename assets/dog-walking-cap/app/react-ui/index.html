@@ -1,0 +1,853 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paw &amp; Go &#x2013; Dog Walking Service</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #2e7d32;
+      --primary-dark: #1b5e20;
+      --primary-light: #e8f5e9;
+      --accent: #ff8f00;
+      --accent-light: #fff8e1;
+      --danger: #c62828;
+      --danger-light: #ffebee;
+      --text: #212121;
+      --text-muted: #757575;
+      --border: #e0e0e0;
+      --bg: #f5f5f5;
+      --white: #ffffff;
+      --radius: 8px;
+      --shadow: 0 2px 8px rgba(0,0,0,.12);
+    }
+
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); }
+
+    #app { display: flex; flex-direction: column; min-height: 100vh; }
+
+    header {
+      background: var(--primary); color: #fff;
+      padding: 0 24px; display: flex; align-items: center;
+      height: 56px; gap: 32px; box-shadow: var(--shadow);
+    }
+    header h1 { font-size: 1.2rem; font-weight: 600; white-space: nowrap; }
+
+    nav { display: flex; gap: 4px; flex: 1; overflow-x: auto; }
+    nav button {
+      background: none; border: none; color: rgba(255,255,255,.8);
+      padding: 8px 14px; border-radius: var(--radius); cursor: pointer;
+      font-size: .9rem; white-space: nowrap; transition: background .15s, color .15s;
+    }
+    nav button:hover  { background: rgba(255,255,255,.15); color: #fff; }
+    nav button.active { background: rgba(255,255,255,.25); color: #fff; font-weight: 600; }
+
+    main { flex: 1; padding: 24px; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+    .card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
+    .card-header h2 { font-size: 1.1rem; font-weight: 600; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border: none; border-radius: var(--radius);
+      cursor: pointer; font-size: .875rem; font-weight: 500; transition: filter .15s;
+    }
+    .btn:hover    { filter: brightness(.9); }
+    .btn-primary  { background: var(--primary); color: #fff; }
+    .btn-danger   { background: var(--danger); color: #fff; }
+    .btn-ghost    { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
+    .btn-sm       { padding: 4px 10px; font-size: .8rem; }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: var(--primary-light); color: var(--primary-dark); font-weight: 600; }
+    tr:hover td { background: #fafafa; }
+    td:last-child { white-space: nowrap; }
+
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: .75rem; font-weight: 600; }
+    .badge-green  { background: var(--primary-light); color: var(--primary-dark); }
+    .badge-orange { background: var(--accent-light); color: #e65100; }
+    .badge-red    { background: var(--danger-light); color: var(--danger); }
+    .badge-gray   { background: #f5f5f5; color: var(--text-muted); }
+    .badge-blue   { background: #e3f2fd; color: #1565c0; }
+
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,.45);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; padding: 16px;
+    }
+    .modal {
+      background: var(--white); border-radius: var(--radius);
+      box-shadow: 0 8px 32px rgba(0,0,0,.2);
+      padding: 24px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto;
+    }
+    .modal h3 { margin-bottom: 20px; font-size: 1.1rem; }
+
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: .85rem; color: var(--text-muted); margin-bottom: 4px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 8px 10px; border: 1px solid var(--border);
+      border-radius: var(--radius); font-size: .9rem; background: var(--white);
+    }
+    .form-group input:focus, .form-group select:focus {
+      outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(46,125,50,.15);
+    }
+    .form-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+    #toast { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
+    .toast-item {
+      padding: 12px 18px; border-radius: var(--radius); color: #fff;
+      font-size: .875rem; box-shadow: var(--shadow); animation: slideIn .2s ease; max-width: 340px;
+    }
+    .toast-success { background: var(--primary); }
+    .toast-error   { background: var(--danger); }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: none; opacity: 1; } }
+
+    .empty   { text-align: center; color: var(--text-muted); padding: 40px 0; font-size: 1rem; }
+    .loading { text-align: center; color: var(--text-muted); padding: 40px 0; }
+    .search-bar { padding: 7px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: .9rem; width: 220px; }
+
+    .schedule-grid { display: grid; gap: 12px; }
+    .schedule-card {
+      background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 14px 16px; display: flex; gap: 16px; align-items: flex-start;
+    }
+    .schedule-time {
+      background: var(--primary); color: #fff; border-radius: var(--radius);
+      padding: 6px 10px; font-weight: 700; font-size: .9rem; min-width: 60px; text-align: center;
+    }
+    .schedule-info { flex: 1; }
+    .schedule-info strong { display: block; font-size: .95rem; }
+    .schedule-info small  { color: var(--text-muted); font-size: .8rem; }
+
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; text-align: center; }
+    .stat-card .num { font-size: 2rem; font-weight: 700; color: var(--primary); }
+    .stat-card .lbl { font-size: .8rem; color: var(--text-muted); margin-top: 4px; }
+
+    @media print {
+      header, nav, .btn, #toast { display: none !important; }
+      .card { box-shadow: none; border: 1px solid #ccc; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>&#x1F43E; Paw &amp; Go</h1>
+    <nav id="nav"></nav>
+  </header>
+  <main id="main"><div class="loading">Loading&#x2026;</div></main>
+</div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+// ═══════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════
+const API = '/api';
+
+async function apiFetch(path, opts) {
+  const res = await fetch(API + path, opts || {});
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error((body.error && body.error.message) || body.message || res.statusText);
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : {};
+}
+
+function toast(msg, type) {
+  const el = document.createElement('div');
+  el.className = 'toast-item toast-' + (type || 'success');
+  el.textContent = msg;
+  document.getElementById('toast').appendChild(el);
+  setTimeout(function() { el.remove(); }, 3500);
+}
+
+function esc(v) {
+  return String(v == null ? '' : v)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function fullName(obj) {
+  if (!obj) return '';
+  return ((obj.firstName || '') + ' ' + (obj.lastName || '')).trim();
+}
+
+function formatDate(d) {
+  if (!d) return '\u2014';
+  return new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function fmtMoney(v) { return v != null ? '$' + Number(v).toFixed(2) : '\u2014'; }
+
+function badge(text, color) { return '<span class="badge badge-' + (color||'gray') + '">' + esc(text) + '</span>'; }
+
+function statusBadge(s) {
+  return badge(s, s === 'confirmed' || s === 'completed' || s === 'paid' ? 'green' :
+                   s === 'cancelled' || s === 'waived' ? 'red' : 'orange');
+}
+
+function dayName(n) { return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][n] || n; }
+
+// ═══════════════════════════════════════════
+//  ROUTER
+// ═══════════════════════════════════════════
+const VIEWS = [
+  { id: 'schedule',      label: '&#x1F4C5; Schedule',      fn: renderSchedule },
+  { id: 'appointments',  label: '&#x1F4CB; Appointments',  fn: renderAppointments },
+  { id: 'walkers',       label: '&#x1F6B6; Walkers',       fn: renderWalkers },
+  { id: 'customers',     label: '&#x1F465; Customers',     fn: renderCustomers },
+  { id: 'dogs',          label: '&#x1F436; Dogs',          fn: renderDogs },
+  { id: 'billing',       label: '&#x1F4B0; Billing',       fn: renderBilling },
+  { id: 'confirmations', label: '&#x2705; Confirmations',  fn: renderConfirmations },
+];
+let currentView = 'schedule';
+
+function buildNav() {
+  document.getElementById('nav').innerHTML = VIEWS.map(function(v) {
+    return '<button class="' + (v.id === currentView ? 'active' : '') + '" onclick="navigate(\'' + v.id + '\')">' + v.label + '</button>';
+  }).join('');
+}
+
+function navigate(id) {
+  currentView = id;
+  buildNav();
+  const v = VIEWS.find(function(x) { return x.id === id; });
+  if (v) v.fn();
+}
+
+// ═══════════════════════════════════════════
+//  SCHEDULE VIEW
+// ═══════════════════════════════════════════
+function renderSchedule() {
+  const today = new Date().toISOString().slice(0, 10);
+  document.getElementById('main').innerHTML =
+    '<div class="card">' +
+    '  <div class="card-header">' +
+    '    <h2>&#x1F4C5; Daily Schedule</h2>' +
+    '    <div style="display:flex;gap:8px;align-items:center">' +
+    '      <input type="date" id="sched-date" value="' + today + '" class="search-bar" style="width:160px">' +
+    '      <button class="btn btn-primary" onclick="loadSchedule()">Load</button>' +
+    '      <button class="btn btn-ghost" onclick="window.print()">&#x1F5A8; Print</button>' +
+    '    </div>' +
+    '  </div>' +
+    '  <div id="sched-body"><div class="loading">Select a date and click Load.</div></div>' +
+    '</div>';
+  loadSchedule();
+}
+
+async function loadSchedule() {
+  const dateEl = document.getElementById('sched-date');
+  const body = document.getElementById('sched-body');
+  if (!dateEl || !body) return;
+  const date = dateEl.value;
+  body.innerHTML = '<div class="loading">Loading&#x2026;</div>';
+  try {
+    const data = await apiFetch('/getDailySchedule(date=\'' + date + '\')');
+    const rows = data.value || [];
+    if (!rows.length) {
+      body.innerHTML = '<div class="empty">No appointments for ' + formatDate(date) + '.</div>';
+      return;
+    }
+    // Group by walker
+    const byWalker = {};
+    rows.forEach(function(r) {
+      const wk = ((r.walkerFirstName || '') + ' ' + (r.walkerLastName || '')).trim() || 'Unknown';
+      if (!byWalker[wk]) byWalker[wk] = [];
+      byWalker[wk].push(r);
+    });
+    let html = '';
+    Object.keys(byWalker).forEach(function(walker) {
+      html += '<h3 style="margin:16px 0 8px;color:var(--primary)">&#x1F6B6; ' + esc(walker) + '</h3>';
+      html += '<div class="schedule-grid">';
+      byWalker[walker].forEach(function(a) {
+        const cName = ((a.customerFirstName || '') + ' ' + (a.customerLastName || '')).trim();
+        html += '<div class="schedule-card">' +
+          '<div class="schedule-time">' + esc(a.timeSlot || '') + '</div>' +
+          '<div class="schedule-info">' +
+          '<strong>' + esc(cName) + ' &ndash; ' + esc(a.dogNames || '') + '</strong>' +
+          '<small>Fee: ' + fmtMoney(a.totalFee) + ' &nbsp;' + statusBadge(a.status) + '</small>' +
+          '</div></div>';
+      });
+      html += '</div>';
+    });
+    body.innerHTML = html;
+  } catch(e) {
+    body.innerHTML = '<div class="empty" style="color:var(--danger)">' + esc(e.message) + '</div>';
+  }
+}
+
+// ═══════════════════════════════════════════
+//  APPOINTMENTS VIEW
+// ═══════════════════════════════════════════
+var apptCache = { appointments: [], walkers: [], customers: [], dogs: [], slots: [] };
+
+async function renderAppointments() {
+  const main = document.getElementById('main');
+  main.innerHTML = '<div class="loading">Loading&#x2026;</div>';
+  try {
+    const results = await Promise.all([
+      apiFetch('/Appointments?$expand=walker,customer,dogs($expand=dog)&$orderby=date,timeSlot'),
+      apiFetch('/Walkers?$orderby=firstName,lastName'),
+      apiFetch('/Customers?$orderby=firstName,lastName'),
+      apiFetch('/Dogs?$orderby=name'),
+      apiFetch('/getValidSlots()'),
+    ]);
+    apptCache.appointments = results[0].value || [];
+    apptCache.walkers      = results[1].value || [];
+    apptCache.customers    = results[2].value || [];
+    apptCache.dogs         = results[3].value || [];
+    apptCache.slots        = results[4].value || [];
+    drawApptTable('');
+  } catch(e) {
+    main.innerHTML = '<div class="card"><div class="empty" style="color:var(--danger)">' + esc(e.message) + '</div></div>';
+  }
+}
+
+function drawApptTable(filter) {
+  const main = document.getElementById('main');
+  const lf = (filter || '').toLowerCase();
+  const rows = apptCache.appointments.filter(function(a) {
+    if (!lf) return true;
+    const wn = fullName(a.walker);
+    const cn = fullName(a.customer);
+    return [wn, cn, a.date, a.timeSlot, a.status].some(function(v) {
+      return String(v || '').toLowerCase().indexOf(lf) !== -1;
+    });
+  });
+
+  const total = apptCache.appointments.length;
+  const stats = { scheduled: 0, confirmed: 0, cancelled: 0, completed: 0 };
+  apptCache.appointments.forEach(function(a) { if (a.status in stats) stats[a.status]++; });
+
+  let html =
+    '<div class="stats-row">' +
+    '  <div class="stat-card"><div class="num">' + total + '</div><div class="lbl">Total</div></div>' +
+    '  <div class="stat-card"><div class="num">' + stats.scheduled + '</div><div class="lbl">Scheduled</div></div>' +
+    '  <div class="stat-card"><div class="num">' + stats.confirmed + '</div><div class="lbl">Confirmed</div></div>' +
+    '  <div class="stat-card"><div class="num">' + stats.completed + '</div><div class="lbl">Completed</div></div>' +
+    '</div>' +
+    '<div class="card">' +
+    '  <div class="card-header"><h2>&#x1F4CB; Appointments</h2>' +
+    '    <div style="display:flex;gap:8px">' +
+    '      <input class="search-bar" placeholder="Search&#x2026;" oninput="drawApptTable(this.value)" value="' + esc(filter) + '">' +
+    '      <button class="btn btn-primary" onclick="openApptModal()">+ Book</button>' +
+    '    </div>' +
+    '  </div>' +
+    '  <div class="table-wrap"><table>' +
+    '    <thead><tr><th>Date</th><th>Time</th><th>Walker</th><th>Customer</th><th>Dogs</th><th>Fee</th><th>Status</th><th>Actions</th></tr></thead>' +
+    '    <tbody>';
+
+  if (rows.length) {
+    rows.forEach(function(a) {
+      const dogNames = (a.dogs || []).map(function(ad) { return ad.dog ? ad.dog.name : '?'; }).join(', ');
+      const actions =
+        (a.status === 'scheduled' ? '<button class="btn btn-sm btn-primary" onclick="patchAppt(\'' + a.ID + '\',\'confirmed\')">Confirm</button> ' : '') +
+        (a.status !== 'cancelled' ? '<button class="btn btn-sm btn-danger" onclick="cancelApptConfirm(\'' + a.ID + '\')">Cancel</button>' : '');
+      html += '<tr>' +
+        '<td>' + esc(a.date) + '</td>' +
+        '<td>' + esc(a.timeSlot) + '</td>' +
+        '<td>' + esc(fullName(a.walker)) + '</td>' +
+        '<td>' + esc(fullName(a.customer)) + '</td>' +
+        '<td>' + esc(dogNames) + '</td>' +
+        '<td>' + fmtMoney(a.totalFee) + '</td>' +
+        '<td>' + statusBadge(a.status) + '</td>' +
+        '<td>' + actions + '</td>' +
+        '</tr>';
+    });
+  } else {
+    html += '<tr><td colspan="8" class="empty">No appointments found.</td></tr>';
+  }
+  html += '    </tbody></table></div></div>';
+  main.innerHTML = html;
+}
+
+function openApptModal() {
+  const today = new Date().toISOString().slice(0, 10);
+  const slotOpts = apptCache.slots.map(function(s) {
+    var sv = typeof s === 'string' ? s : (s.slot || '');
+    return '<option value="' + esc(sv) + '">' + esc(sv) + '</option>';
+  }).join('');
+  const walkerOpts = apptCache.walkers.map(function(w) {
+    return '<option value="' + esc(w.ID) + '">' + esc(fullName(w)) + '</option>';
+  }).join('');
+  const custOpts = apptCache.customers.map(function(c) {
+    return '<option value="' + esc(c.ID) + '">' + esc(fullName(c)) + '</option>';
+  }).join('');
+  const html =
+    '<div class="modal-backdrop" id="appt-modal" onclick="closeModal(\'appt-modal\')">' +
+    '  <div class="modal" onclick="event.stopPropagation()">' +
+    '    <h3>Book Appointment</h3>' +
+    '    <div class="form-group"><label>Date</label><input type="date" id="af-date" value="' + today + '"></div>' +
+    '    <div class="form-group"><label>Time Slot</label><select id="af-slot">' + slotOpts + '</select></div>' +
+    '    <div class="form-group"><label>Walker</label><select id="af-walker"><option value="">&#x2014; Select &#x2014;</option>' + walkerOpts + '</select></div>' +
+    '    <div class="form-group"><label>Customer</label><select id="af-customer" onchange="filterApptDogs(this.value)"><option value="">&#x2014; Select &#x2014;</option>' + custOpts + '</select></div>' +
+    '    <div class="form-group"><label>Dogs (hold Ctrl/Cmd for multiple)</label>' +
+    '      <select id="af-dogs" multiple size="5" style="height:110px"><option disabled value="">Select a customer first</option></select></div>' +
+    '    <div class="form-actions">' +
+    '      <button class="btn btn-ghost" onclick="closeModal(\'appt-modal\')">Cancel</button>' +
+    '      <button class="btn btn-primary" onclick="saveAppt()">Book</button>' +
+    '    </div>' +
+    '  </div>' +
+    '</div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+async function saveAppt() {
+  const date     = document.getElementById('af-date').value;
+  const slot     = document.getElementById('af-slot').value;
+  const walkerId = document.getElementById('af-walker').value;
+  const custId   = document.getElementById('af-customer').value;
+  const dogIds   = Array.from(document.getElementById('af-dogs').selectedOptions).map(function(o) { return o.value; });
+
+  if (!date || !slot || !walkerId || !custId || !dogIds.length) {
+    return toast('Please fill in all fields and select at least one dog.', 'error');
+  }
+  try {
+    await apiFetch('/Appointments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ date: date, timeSlot: slot, walker_ID: walkerId, customer_ID: custId, dogs: dogIds.map(function(id) { return { dog_ID: id }; }) }),
+    });
+    closeModal('appt-modal');
+    toast('Appointment booked!');
+    renderAppointments();
+  } catch(e) {
+    toast(e.message, 'error');
+  }
+}
+
+function filterApptDogs(custId) {
+  const sel = document.getElementById('af-dogs');
+  if (!sel) return;
+  sel.innerHTML = '';
+  const filtered = custId
+    ? apptCache.dogs.filter(function(d) { return d.owner_ID === custId; })
+    : apptCache.dogs;
+  if (!filtered.length) {
+    sel.innerHTML = '<option disabled value="">No dogs for this customer</option>';
+    return;
+  }
+  filtered.forEach(function(d) {
+    var opt = document.createElement('option');
+    opt.value = d.ID;
+    opt.textContent = d.name + ' (' + (d.breed || '?') + ')';
+    sel.appendChild(opt);
+  });
+}
+
+async function patchAppt(id, status) {
+  try {
+    await apiFetch('/Appointments/' + id, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: status }),
+    });
+    toast('Appointment ' + status + '.');
+    renderAppointments();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+function cancelApptConfirm(id) {
+  if (confirm('Cancel this appointment?')) patchAppt(id, 'cancelled');
+}
+
+function closeModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+// ═══════════════════════════════════════════
+//  WALKERS VIEW
+// ═══════════════════════════════════════════
+async function renderWalkers() {
+  const main = document.getElementById('main');
+  main.innerHTML = '<div class="loading">Loading&#x2026;</div>';
+  try {
+    const res = await apiFetch('/Walkers?$expand=availability&$orderby=firstName,lastName');
+    const walkers = res.value || [];
+    let rows = '';
+    walkers.forEach(function(w) {
+      const avail = (w.availability || []).map(function(a) {
+        return dayName(a.dayOfWeek) + ' ' + (a.startTime || '') + '&#x2013;' + (a.endTime || '');
+      }).join(', ') || '&#x2014;';
+      const encodedW = encodeURIComponent(JSON.stringify(w));
+      rows += '<tr>' +
+        '<td><strong>' + esc(fullName(w)) + '</strong></td>' +
+        '<td>' + esc(w.phone || '\u2014') + '</td>' +
+        '<td>' + esc(w.email || '\u2014') + '</td>' +
+        '<td>' + (w.isActive ? badge('Active', 'green') : badge('Inactive', 'gray')) + '</td>' +
+        '<td><small>' + avail + '</small></td>' +
+        '<td><button class="btn btn-sm btn-ghost" onclick="openWalkerModal(\'' + encodedW + '\')">Edit</button></td>' +
+        '</tr>';
+    });
+    main.innerHTML =
+      '<div class="card">' +
+      '  <div class="card-header"><h2>&#x1F6B6; Walkers (' + walkers.length + ')</h2>' +
+      '    <button class="btn btn-primary" onclick="openWalkerModal()">+ Add Walker</button></div>' +
+      '  <div class="table-wrap"><table>' +
+      '    <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Active</th><th>Availability</th><th>Actions</th></tr></thead>' +
+      '    <tbody>' + (rows || '<tr><td colspan="6" class="empty">No walkers.</td></tr>') + '</tbody>' +
+      '  </table></div>' +
+      '</div>';
+  } catch(e) {
+    main.innerHTML = '<div class="card"><div class="empty" style="color:var(--danger)">' + esc(e.message) + '</div></div>';
+  }
+}
+
+function openWalkerModal(encoded) {
+  const w = encoded ? JSON.parse(decodeURIComponent(encoded)) : null;
+  const html =
+    '<div class="modal-backdrop" id="walker-modal" onclick="closeModal(\'walker-modal\')">' +
+    '  <div class="modal" onclick="event.stopPropagation()">' +
+    '    <h3>' + (w ? 'Edit Walker' : 'Add Walker') + '</h3>' +
+    '    <div class="form-row">' +
+    '      <div class="form-group"><label>First Name *</label><input id="wf-first" value="' + esc(w ? w.firstName : '') + '"></div>' +
+    '      <div class="form-group"><label>Last Name *</label><input id="wf-last" value="' + esc(w ? w.lastName : '') + '"></div>' +
+    '    </div>' +
+    '    <div class="form-row">' +
+    '      <div class="form-group"><label>Phone</label><input id="wf-phone" value="' + esc(w ? (w.phone || '') : '') + '"></div>' +
+    '      <div class="form-group"><label>Email</label><input id="wf-email" type="email" value="' + esc(w ? (w.email || '') : '') + '"></div>' +
+    '    </div>' +
+    '    <div class="form-group"><label>Active</label>' +
+    '      <select id="wf-active">' +
+    '        <option value="true"' + ((!w || w.isActive !== false) ? ' selected' : '') + '>Yes</option>' +
+    '        <option value="false"' + ((w && w.isActive === false) ? ' selected' : '') + '>No</option>' +
+    '      </select></div>' +
+    '    <div class="form-actions">' +
+    '      <button class="btn btn-ghost" onclick="closeModal(\'walker-modal\')">Cancel</button>' +
+    '      <button class="btn btn-primary" onclick="saveWalker(\'' + esc(w ? w.ID : '') + '\')">Save</button>' +
+    '    </div>' +
+    '  </div>' +
+    '</div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+async function saveWalker(id) {
+  const firstName = document.getElementById('wf-first').value.trim();
+  const lastName  = document.getElementById('wf-last').value.trim();
+  if (!firstName || !lastName) return toast('First and last name are required', 'error');
+  const body = {
+    firstName: firstName,
+    lastName:  lastName,
+    phone:     document.getElementById('wf-phone').value.trim() || null,
+    email:     document.getElementById('wf-email').value.trim() || null,
+    isActive:  document.getElementById('wf-active').value === 'true',
+  };
+  try {
+    if (id) {
+      await apiFetch('/Walkers/' + id, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      toast('Walker updated!');
+    } else {
+      await apiFetch('/Walkers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      toast('Walker added!');
+    }
+    closeModal('walker-modal');
+    renderWalkers();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════
+//  CUSTOMERS VIEW
+// ═══════════════════════════════════════════
+async function renderCustomers() {
+  const main = document.getElementById('main');
+  main.innerHTML = '<div class="loading">Loading&#x2026;</div>';
+  try {
+    const res = await apiFetch('/Customers?$expand=dogs&$orderby=firstName,lastName');
+    const customers = res.value || [];
+    let rows = '';
+    customers.forEach(function(c) {
+      const dogBadges = (c.dogs || []).map(function(d) { return '<span class="badge badge-green">' + esc(d.name) + '</span>'; }).join(' ') || '\u2014';
+      const encodedC = encodeURIComponent(JSON.stringify(c));
+      rows += '<tr>' +
+        '<td><strong>' + esc(fullName(c)) + '</strong></td>' +
+        '<td>' + esc(c.phone || '\u2014') + '</td>' +
+        '<td>' + esc(c.email || '\u2014') + '</td>' +
+        '<td>' + dogBadges + '</td>' +
+        '<td><button class="btn btn-sm btn-ghost" onclick="openCustModal(\'' + encodedC + '\')">Edit</button></td>' +
+        '</tr>';
+    });
+    main.innerHTML =
+      '<div class="card">' +
+      '  <div class="card-header"><h2>&#x1F465; Customers (' + customers.length + ')</h2>' +
+      '    <button class="btn btn-primary" onclick="openCustModal()">+ Add Customer</button></div>' +
+      '  <div class="table-wrap"><table>' +
+      '    <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Dogs</th><th>Actions</th></tr></thead>' +
+      '    <tbody>' + (rows || '<tr><td colspan="5" class="empty">No customers.</td></tr>') + '</tbody>' +
+      '  </table></div>' +
+      '</div>';
+  } catch(e) {
+    main.innerHTML = '<div class="card"><div class="empty" style="color:var(--danger)">' + esc(e.message) + '</div></div>';
+  }
+}
+
+function openCustModal(encoded) {
+  const c = encoded ? JSON.parse(decodeURIComponent(encoded)) : null;
+  const html =
+    '<div class="modal-backdrop" id="cust-modal" onclick="closeModal(\'cust-modal\')">' +
+    '  <div class="modal" onclick="event.stopPropagation()">' +
+    '    <h3>' + (c ? 'Edit Customer' : 'Add Customer') + '</h3>' +
+    '    <div class="form-row">' +
+    '      <div class="form-group"><label>First Name *</label><input id="cf-first" value="' + esc(c ? c.firstName : '') + '"></div>' +
+    '      <div class="form-group"><label>Last Name *</label><input id="cf-last" value="' + esc(c ? c.lastName : '') + '"></div>' +
+    '    </div>' +
+    '    <div class="form-row">' +
+    '      <div class="form-group"><label>Phone</label><input id="cf-phone" value="' + esc(c ? (c.phone || '') : '') + '"></div>' +
+    '      <div class="form-group"><label>Email</label><input id="cf-email" type="email" value="' + esc(c ? (c.email || '') : '') + '"></div>' +
+    '    </div>' +
+    '    <div class="form-actions">' +
+    '      <button class="btn btn-ghost" onclick="closeModal(\'cust-modal\')">Cancel</button>' +
+    '      <button class="btn btn-primary" onclick="saveCust(\'' + esc(c ? c.ID : '') + '\')">Save</button>' +
+    '    </div>' +
+    '  </div>' +
+    '</div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+async function saveCust(id) {
+  const firstName = document.getElementById('cf-first').value.trim();
+  const lastName  = document.getElementById('cf-last').value.trim();
+  if (!firstName || !lastName) return toast('First and last name are required', 'error');
+  const body = {
+    firstName: firstName,
+    lastName:  lastName,
+    phone: document.getElementById('cf-phone').value.trim() || null,
+    email: document.getElementById('cf-email').value.trim() || null,
+  };
+  try {
+    if (id) {
+      await apiFetch('/Customers/' + id, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      toast('Customer updated!');
+    } else {
+      await apiFetch('/Customers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      toast('Customer added!');
+    }
+    closeModal('cust-modal');
+    renderCustomers();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════
+//  DOGS VIEW
+// ═══════════════════════════════════════════
+var _dogCusts = [];
+
+async function renderDogs() {
+  const main = document.getElementById('main');
+  main.innerHTML = '<div class="loading">Loading&#x2026;</div>';
+  try {
+    const results = await Promise.all([
+      apiFetch('/Dogs?$expand=owner&$orderby=name'),
+      apiFetch('/Customers?$orderby=firstName,lastName'),
+    ]);
+    const dogs      = results[0].value || [];
+    _dogCusts = results[1].value || [];
+    let rows = '';
+    dogs.forEach(function(d) {
+      const ownerName = fullName(d.owner);
+      const encodedD = encodeURIComponent(JSON.stringify(d));
+      rows += '<tr>' +
+        '<td><strong>' + esc(d.name) + '</strong></td>' +
+        '<td>' + esc(d.breed || '\u2014') + '</td>' +
+        '<td>' + esc(d.color || '\u2014') + '</td>' +
+        '<td>' + (d.weight != null ? d.weight + ' lb' : '\u2014') + '</td>' +
+        '<td>' + formatDate(d.dateOfBirth) + '</td>' +
+        '<td>' + esc(ownerName || '\u2014') + '</td>' +
+        '<td><small>' + esc(d.notes || '\u2014') + '</small></td>' +
+        '<td><button class="btn btn-sm btn-ghost" onclick="openDogModal(\'' + encodedD + '\')">Edit</button></td>' +
+        '</tr>';
+    });
+    main.innerHTML =
+      '<div class="card">' +
+      '  <div class="card-header"><h2>&#x1F436; Dogs (' + dogs.length + ')</h2>' +
+      '    <button class="btn btn-primary" onclick="openDogModal()">+ Add Dog</button></div>' +
+      '  <div class="table-wrap"><table>' +
+      '    <thead><tr><th>Name</th><th>Breed</th><th>Color</th><th>Weight</th><th>Born</th><th>Owner</th><th>Notes</th><th>Actions</th></tr></thead>' +
+      '    <tbody>' + (rows || '<tr><td colspan="8" class="empty">No dogs.</td></tr>') + '</tbody>' +
+      '  </table></div>' +
+      '</div>';
+  } catch(e) {
+    main.innerHTML = '<div class="card"><div class="empty" style="color:var(--danger)">' + esc(e.message) + '</div></div>';
+  }
+}
+
+function openDogModal(encoded) {
+  const d = encoded ? JSON.parse(decodeURIComponent(encoded)) : null;
+  const custOpts = _dogCusts.map(function(c) {
+    const sel = d && d.owner_ID === c.ID ? ' selected' : '';
+    return '<option value="' + esc(c.ID) + '"' + sel + '>' + esc(fullName(c)) + '</option>';
+  }).join('');
+  const html =
+    '<div class="modal-backdrop" id="dog-modal" onclick="closeModal(\'dog-modal\')">' +
+    '  <div class="modal" onclick="event.stopPropagation()">' +
+    '    <h3>' + (d ? 'Edit Dog' : 'Add Dog') + '</h3>' +
+    '    <div class="form-row">' +
+    '      <div class="form-group"><label>Name *</label><input id="df-name" value="' + esc(d ? d.name : '') + '"></div>' +
+    '      <div class="form-group"><label>Breed</label><input id="df-breed" value="' + esc(d ? (d.breed || '') : '') + '"></div>' +
+    '    </div>' +
+    '    <div class="form-row">' +
+    '      <div class="form-group"><label>Color</label><input id="df-color" value="' + esc(d ? (d.color || '') : '') + '"></div>' +
+    '      <div class="form-group"><label>Weight (lb)</label><input id="df-weight" type="number" min="0" step="0.1" value="' + esc(d && d.weight != null ? d.weight : '') + '"></div>' +
+    '    </div>' +
+    '    <div class="form-row">' +
+    '      <div class="form-group"><label>Date of Birth</label><input id="df-dob" type="date" value="' + esc(d ? (d.dateOfBirth || '') : '') + '"></div>' +
+    '      <div class="form-group"><label>License No.</label><input id="df-lic" value="' + esc(d ? (d.licenseNo || '') : '') + '"></div>' +
+    '    </div>' +
+    '    <div class="form-group"><label>Owner</label>' +
+    '      <select id="df-owner"><option value="">&#x2014; Select Owner &#x2014;</option>' + custOpts + '</select></div>' +
+    '    <div class="form-group"><label>Notes</label><textarea id="df-notes" rows="2">' + esc(d ? (d.notes || '') : '') + '</textarea></div>' +
+    '    <div class="form-actions">' +
+    '      <button class="btn btn-ghost" onclick="closeModal(\'dog-modal\')">Cancel</button>' +
+    '      <button class="btn btn-primary" onclick="saveDog(\'' + esc(d ? d.ID : '') + '\')">Save</button>' +
+    '    </div>' +
+    '  </div>' +
+    '</div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+async function saveDog(id) {
+  const name = document.getElementById('df-name').value.trim();
+  if (!name) return toast('Name is required', 'error');
+  const wt = parseFloat(document.getElementById('df-weight').value);
+  const body = {
+    name:        name,
+    breed:       document.getElementById('df-breed').value.trim() || null,
+    color:       document.getElementById('df-color').value.trim() || null,
+    weight:      isNaN(wt) ? null : wt,
+    dateOfBirth: document.getElementById('df-dob').value || null,
+    licenseNo:   document.getElementById('df-lic').value.trim() || null,
+    owner_ID:    document.getElementById('df-owner').value || null,
+    notes:       document.getElementById('df-notes').value.trim() || null,
+  };
+  try {
+    if (id) {
+      await apiFetch('/Dogs/' + id, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      toast('Dog updated!');
+    } else {
+      await apiFetch('/Dogs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      toast('Dog added!');
+    }
+    closeModal('dog-modal');
+    renderDogs();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════
+//  BILLING VIEW
+// ═══════════════════════════════════════════
+async function renderBilling() {
+  const main = document.getElementById('main');
+  main.innerHTML = '<div class="loading">Loading&#x2026;</div>';
+  try {
+    const res = await apiFetch('/BillingRecords?$expand=appointment($expand=customer,walker)&$orderby=issuedAt desc');
+    const records = res.value || [];
+
+    var totalAmt = 0, paidAmt = 0;
+    records.forEach(function(r) {
+      totalAmt += (r.amount || 0);
+      if (r.status === 'paid') paidAmt += (r.amount || 0);
+    });
+
+    let rows = '';
+    records.forEach(function(r) {
+      const custName   = fullName(r.appointment && r.appointment.customer);
+      const walkerName = fullName(r.appointment && r.appointment.walker);
+      const markPaidBtn = r.status !== 'paid'
+        ? '<button class="btn btn-sm btn-primary" onclick="markPaid(\'' + r.ID + '\')">Mark Paid</button>'
+        : '';
+      rows += '<tr>' +
+        '<td>' + formatDate(r.issuedAt) + '</td>' +
+        '<td>' + esc(custName || '\u2014') + '</td>' +
+        '<td>' + esc(walkerName || '\u2014') + '</td>' +
+        '<td><strong>' + fmtMoney(r.amount) + '</strong></td>' +
+        '<td>' + statusBadge(r.status) + '</td>' +
+        '<td>' + esc(r.method || '\u2014') + '</td>' +
+        '<td>' + markPaidBtn + '</td>' +
+        '</tr>';
+    });
+
+    main.innerHTML =
+      '<div class="stats-row">' +
+      '  <div class="stat-card"><div class="num">' + records.length + '</div><div class="lbl">Invoices</div></div>' +
+      '  <div class="stat-card"><div class="num">' + fmtMoney(totalAmt) + '</div><div class="lbl">Total Billed</div></div>' +
+      '  <div class="stat-card"><div class="num">' + fmtMoney(paidAmt) + '</div><div class="lbl">Collected</div></div>' +
+      '  <div class="stat-card"><div class="num">' + fmtMoney(totalAmt - paidAmt) + '</div><div class="lbl">Outstanding</div></div>' +
+      '</div>' +
+      '<div class="card">' +
+      '  <div class="card-header"><h2>&#x1F4B0; Billing Records</h2></div>' +
+      '  <div class="table-wrap"><table>' +
+      '    <thead><tr><th>Issued</th><th>Customer</th><th>Walker</th><th>Amount</th><th>Status</th><th>Method</th><th>Actions</th></tr></thead>' +
+      '    <tbody>' + (rows || '<tr><td colspan="7" class="empty">No records.</td></tr>') + '</tbody>' +
+      '  </table></div>' +
+      '</div>';
+  } catch(e) {
+    main.innerHTML = '<div class="card"><div class="empty" style="color:var(--danger)">' + esc(e.message) + '</div></div>';
+  }
+}
+
+async function markPaid(id) {
+  try {
+    await apiFetch('/BillingRecords/' + id, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'paid' }),
+    });
+    toast('Marked as paid!');
+    renderBilling();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════
+//  CONFIRMATIONS VIEW
+// ═══════════════════════════════════════════
+async function renderConfirmations() {
+  const main = document.getElementById('main');
+  main.innerHTML = '<div class="loading">Loading&#x2026;</div>';
+  try {
+    const res = await apiFetch('/Confirmations?$expand=appointment($expand=customer,walker)&$orderby=confirmedAt desc');
+    const confs = res.value || [];
+    let rows = '';
+    confs.forEach(function(c) {
+      const custName   = fullName(c.appointment && c.appointment.customer);
+      const walkerName = fullName(c.appointment && c.appointment.walker);
+      rows += '<tr>' +
+        '<td>' + formatDate(c.confirmedAt) + '</td>' +
+        '<td>' + esc(custName || '\u2014') + '</td>' +
+        '<td>' + esc(walkerName || '\u2014') + '</td>' +
+        '<td>' + badge(c.method || 'email', 'gray') + '</td>' +
+        '<td>' + (c.confirmedAt ? badge('Confirmed', 'green') : badge('Pending', 'orange')) + '</td>' +
+        '</tr>';
+    });
+    main.innerHTML =
+      '<div class="card">' +
+      '  <div class="card-header"><h2>&#x2705; Confirmations (' + confs.length + ')</h2></div>' +
+      '  <div class="table-wrap"><table>' +
+      '    <thead><tr><th>Confirmed At</th><th>Customer</th><th>Walker</th><th>Method</th><th>Status</th></tr></thead>' +
+      '    <tbody>' + (rows || '<tr><td colspan="5" class="empty">No confirmations.</td></tr>') + '</tbody>' +
+      '  </table></div>' +
+      '</div>';
+  } catch(e) {
+    main.innerHTML = '<div class="card"><div class="empty" style="color:var(--danger)">' + esc(e.message) + '</div></div>';
+  }
+}
+
+// ═══════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════
+buildNav();
+navigate('schedule');
+</script>
+</body>
+</html>

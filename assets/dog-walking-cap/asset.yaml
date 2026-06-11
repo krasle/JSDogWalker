@@ -1,0 +1,28 @@
+apiVersion: asset.sap/v1
+kind: Asset
+
+metadata:
+  name: dog-walking-cap
+  version: "1.0.0"
+  description: "Paw & Go - Full-stack CAP Node.js application for managing dog walking appointments, customers, dogs, walkers, billing, and daily schedules."
+
+type: cap-app
+
+provides:
+  protocols:
+    - odata-v4
+    - rest
+
+components:
+  - name: srv
+    type: srv
+    buildPath: .
+    port: 4004
+    provides:
+      endpoints:
+        - path: /api
+          port: 4004
+          protocol: http
+      protocols:
+        - odata-v4
+        - rest

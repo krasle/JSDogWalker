@@ -1,0 +1,38 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log
+
+# CAP build artifacts
+target/
+_out/
+gen/
+*.sqlite
+*.mtar
+mta_archives/
+*_mta_build_tmp
+
+# CDS
+.cdsrc-private.json
+default-*.json
+@cds-models/
+
+# Vite / frontend build
+dist/
+.vite/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/settings.json
+
+# Test artifacts
+coverage/

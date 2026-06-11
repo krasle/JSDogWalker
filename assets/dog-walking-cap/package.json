@@ -1,0 +1,33 @@
+{
+  "name": "dog-walking-cap",
+  "version": "1.0.0",
+  "workspaces": ["app/react-ui"],
+  "dependencies": {
+    "@sap/cds": "^9"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^2.4"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "dev": "cds watch",
+    "build": "npm run build -w app/react-ui && cds build --production"
+  },
+  "cds": {
+    "requires": {
+      "db": {
+        "kind": "sqlite",
+        "credentials": { "url": ":memory:" }
+      }
+    },
+    "features": {
+      "preserve_computed": true
+    },
+    "[production]": {
+      "folders": {
+        "app": "app/react-ui/dist"
+      }
+    }
+  },
+  "private": true
+}

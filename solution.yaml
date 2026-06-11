@@ -1,0 +1,10 @@
+apiVersion: solution.sap/v1
+kind: Solution
+
+metadata:
+  name: paw-and-go
+  version: "1.0.0"
+  description: "Paw & Go - Dog Walking Service management application"
+
+assets:
+  - ref: ./assets/dog-walking-cap/asset.yaml

@@ -1,0 +1,76 @@
+ID,owner_ID,name,breed,weight,color,dateOfBirth,licenseNo,notes
+d001,c001,Buddy,Golden Retriever,30.5,Golden,2020-03-15,LIC001,Loves fetch
+d002,c001,Luna,Labrador,28.0,Black,2021-06-20,LIC002,Very friendly
+d003,c002,Max,German Shepherd,35.0,Black and Tan,2019-11-10,LIC003,Well trained
+d004,c003,Bella,Poodle,12.0,White,2022-01-05,LIC004,Hypoallergenic
+d005,c003,Charlie,Beagle,14.0,Tricolor,2021-09-18,LIC005,Loves sniffing
+d006,c004,Daisy,Bulldog,25.0,Brindle,2020-07-22,LIC006,Snores loudly
+d007,c005,Rocky,Rottweiler,40.0,Black,2019-04-30,LIC007,Gentle giant
+d008,c005,Molly,Cocker Spaniel,12.5,Brown,2022-02-14,LIC008,Very playful
+d009,c005,Coco,Shih Tzu,6.0,White,2023-01-01,LIC009,Likes bows
+d010,c006,Bear,Husky,28.0,Gray,2020-12-25,LIC010,Pulls on leash
+d011,c007,Lola,Dachshund,8.0,Brown,2021-05-10,LIC011,Short legs big heart
+d012,c007,Sadie,Yorkshire Terrier,3.5,Tan,2022-08-30,LIC012,Very vocal
+d013,c008,Milo,Boxer,30.0,Fawn,2020-10-10,LIC013,Bouncy
+d014,c009,Rosie,Cavalier King Charles,8.0,Ruby,2021-03-22,LIC014,Gentle
+d015,c010,Zeus,Great Dane,65.0,Blue,2019-08-15,LIC015,Huge but sweet
+d016,c010,Nala,Maltese,4.0,White,2023-03-10,LIC016,Princess
+d017,c011,Biscuit,Border Collie,18.0,Black and White,2020-06-01,LIC017,Very smart
+d018,c012,Pepper,Jack Russell,7.0,White,2022-04-15,LIC018,High energy
+d019,c013,Duke,Doberman,38.0,Black,2019-09-20,LIC019,Loyal
+d020,c014,Ginger,Irish Setter,28.0,Red,2021-01-10,LIC020,Beautiful coat
+d021,c015,Bruno,Saint Bernard,70.0,Brown and White,2020-05-05,LIC021,Drools a lot
+d022,c016,Chloe,Miniature Schnauzer,7.5,Salt and Pepper,2022-07-20,LIC022,Always alert
+d023,c017,Archie,Welsh Corgi,12.0,Sable,2021-11-15,LIC023,Happy ears
+d024,c018,Stella,Australian Shepherd,22.0,Blue Merle,2020-09-01,LIC024,Herds everything
+d025,c019,Oliver,French Bulldog,12.0,Brindle,2022-05-25,LIC025,Snorts cutely
+d026,c020,Ruby,Dalmatian,25.0,White with Black Spots,2020-02-28,LIC026,Fast runner
+d027,c021,Cooper,Labradoodle,20.0,Golden,2021-08-12,LIC027,Fluffy
+d028,c022,Penny,Pomeranian,3.0,Orange,2023-02-14,LIC028,Tiny and fluffy
+d029,c023,Jasper,English Bulldog,25.0,White,2020-11-08,LIC029,Stubborn
+d030,c024,Willow,Siberian Husky,25.0,White,2021-04-20,LIC030,Escape artist
+d031,c025,Teddy,Goldendoodle,22.0,Cream,2022-06-15,LIC031,Non-shedding
+d032,c026,Gracie,Basset Hound,25.0,Tricolor,2020-08-30,LIC032,Long ears
+d033,c027,Diesel,Pit Bull,32.0,Gray,2019-12-12,LIC033,Very gentle
+d034,c028,Peaches,Bichon Frise,6.0,White,2022-09-05,LIC034,Fluffy cloud
+d035,c029,Rex,Labrador,32.0,Yellow,2020-01-18,LIC035,Ball obsessed
+d036,c030,Ivy,Vizsla,22.0,Rust,2021-07-07,LIC036,Athletic
+d037,c031,Ace,German Shorthaired Pointer,28.0,Liver,2020-04-22,LIC037,Bird dog
+d038,c032,Cookie,Maltipoo,5.0,Apricot,2023-04-01,LIC038,Sweet
+d039,c033,Maverick,Belgian Malinois,30.0,Fawn,2019-10-15,LIC039,Intense
+d040,c034,Hazel,Cavalier King Charles,7.5,Blenheim,2022-03-10,LIC040,Cuddly
+d041,c035,Hugo,Newfoundland,65.0,Black,2020-07-04,LIC041,Giant teddy
+d042,c036,Pixie,Chihuahua,2.5,Brown,2022-11-20,LIC042,Tiny but fierce
+d043,c037,Scout,English Springer Spaniel,22.0,Liver and White,2021-06-28,LIC043,Gun dog
+d044,c038,Bentley,Weimaraner,32.0,Silver,2020-03-03,LIC044,Ghost dog
+d045,c039,Piper,Miniature Pinscher,5.0,Black and Tan,2022-08-10,LIC045,Little Dobie
+d046,c040,Moose,Bernese Mountain Dog,48.0,Tricolor,2020-10-31,LIC046,Gentle
+d047,c041,Remi,Samoyed,25.0,White,2021-12-25,LIC047,Smiling dog
+d048,c042,Olive,Shiba Inu,10.0,Red,2022-02-22,LIC048,Independent
+d049,c043,Gunner,Alaskan Malamute,42.0,Gray,2019-11-30,LIC049,Howler
+d050,c044,Poppy,Cocker Spaniel,12.0,Golden,2021-10-10,LIC050,Sweet eyes
+d051,c045,Major,Belgian Malinois,32.0,Fawn,2020-06-15,LIC051,Police trained
+d052,c046,Bambi,Whippet,12.0,Fawn,2022-05-01,LIC052,Fast runner
+d053,c047,Winston,Bloodhound,45.0,Red,2019-08-08,LIC053,Master tracker
+d054,c048,Clover,Irish Wolfhound,60.0,Gray,2020-09-20,LIC054,Tallest dog
+d055,c049,Kodiak,Akita,40.0,Red,2021-02-18,LIC055,Dignified
+d056,c050,Peanut,Toy Poodle,3.0,Apricot,2023-06-01,LIC056,Smart as a whip
+d057,c001,Rusty,Beagle,13.0,Tricolor,2022-10-10,LIC057,Third dog
+d058,c003,Pip,Miniature Schnauzer,7.0,Black,2023-02-01,LIC058,New addition
+d059,c005,Ziggy,Dachshund,9.0,Red,2021-07-15,LIC059,Fourth dog c005
+d060,c007,Biscotti,Maltese,4.5,White,2023-05-10,LIC060,Third dog c007
+d061,c010,Titan,Akita,38.0,Brindle,2020-11-11,LIC061,Third dog c010
+d062,c015,Duchess,Poodle,14.0,Silver,2021-04-04,LIC062,Second dog c015
+d063,c018,Nova,Blue Heeler,16.0,Blue Speckled,2022-01-20,LIC063,Second dog c018
+d064,c020,Rosco,Basset Hound,26.0,Tricolor,2021-09-09,LIC064,Second dog c020
+d065,c022,Buttons,Shih Tzu,6.5,Black and White,2022-12-12,LIC065,Second dog c022
+d066,c025,Maple,Border Collie,17.0,Black and White,2021-03-03,LIC066,Second dog c025
+d067,c028,Truffle,Miniature Schnauzer,7.0,Salt and Pepper,2023-01-15,LIC067,Second dog c028
+d068,c030,Fern,Golden Retriever,28.0,Golden,2021-08-25,LIC068,Second dog c030
+d069,c033,Storm,Husky,26.0,Black and White,2020-05-20,LIC069,Second dog c033
+d070,c035,Cosmo,Labrador,30.0,Chocolate,2022-04-10,LIC070,Second dog c035
+d071,c038,Pearl,Pomeranian,2.5,Cream,2023-03-20,LIC071,Second dog c038
+d072,c040,Ranger,German Shepherd,36.0,Sable,2021-11-05,LIC072,Second dog c040
+d073,c043,Chief,Rottweiler,42.0,Black and Tan,2020-07-14,LIC073,Second dog c043
+d074,c046,Misty,Cocker Spaniel,11.0,Black,2022-08-08,LIC074,Second dog c046
+d075,c050,Noodle,Chinese Crested,5.0,Spotted,2023-04-15,LIC075,Second dog c050
