@@ -14,9 +14,14 @@ This file defines the full set of validation activities available for a UI app.
 **Before presenting the menu, check browser MCP availability:**
 
 Attempt a lightweight probe to determine whether a browser automation server is available. Try in this order:
-1. Chrome DevTools MCP  -  call `take_snapshot()` or `list_pages()`
-2. Playwright MCP  -  call `browser_snapshot()`
+1. Playwright MCP  -  call `browser_snapshot()`
+2. Chrome DevTools MCP  -  call `take_snapshot()` or `list_pages()`
 3. Firefox DevTools MCP  -  call `take_snapshot()`
+
+**Playwright is the preferred tool for all DV checks.** Use Chrome DevTools MCP only for
+sap.viz VizFrame chart interaction tests (D3 event listeners require real coordinate clicks,
+not accessibility-tree clicks). See the browser tool selection rule at the start of the DV
+section below.
 
 If any succeeds, a browser is available. If all fail or are not configured, no browser is available.
 
@@ -44,30 +49,46 @@ Present the complete menu below in plain language. Do not abbreviate it or pre-s
 > A systematic audit working through the app element by element across 8 facets: every control and its state, every data field and its format, every interaction pattern, every text string, every navigation path, accessibility attributes, and cross-facet consistency. The most thorough single-pass check  -  catches truncated labels, missing tooltips, raw codes in chart labels, missing no-data states, and similar issues that task-based testing misses.
 >
 > **4  -  Simulated usability testing** (typically 3-8 fix-retest iterations, browser required)
-> The agent acts as a simulated end user and attempts a set of tasks using only what is visible on screen. Each task is scored PASS / FAIL. Failures go into a defect log and the cycle repeats (fix → retest) until all tasks pass or defects are accepted. The number of iterations depends on app quality  -  a well-built app converges in 3-4 cycles. Requires a task suite  -  if one does not exist it will be generated first from a short description of who uses the app and what they need to do.
+> The agent acts as a simulated end user and attempts a set of tasks using only what is visible on screen. Each task is scored PASS / FAIL. Failures go into a defect log and the cycle repeats (fix → retest) until all tasks pass or defects are accepted. The number of iterations depends on app quality  -  a well-built app converges in 3-4 cycles. Requires a task suite  -  if one does not exist it will be generated first.
 >
-> **5  -  Human usability testing** (depends on your availability)
-> I generate a printable task sheet with plain-language questions. You (or a colleague) try each task in the running app and report back answers and difficulty ratings. I compare the answers against correct values fetched directly from the database, raise defects for wrong or hard-to-find answers, and produce a summary. Finds the gap between what the app technically does and what a real user can actually accomplish.
+> **5  -  Artefact consistency check** (~3 min, no browser needed)
+> Checks that every requirement in the PRD and every entity in the spec actually made it into the schema, service handlers, and UI. Catches the "dropped downstream" pattern: things stated in one document that silently disappear before reaching the implementation. For example a FR that says "auto-generate confirmation on booking" but no AFTER handler implements it, or a "manage" verb in intent.md for an entity that the UI only shows read-only. Does not require the original prompt.
+>
+> **6  -  Improvement catalogue** (~5-10 min, no browser needed)
+> Scans the app against the skill's proactive enterprise-ready rules (ER-N codes) and write-time checklists. Produces two lists: (B) standard violations — things that work but violate a named ER-N rule the skill would have enforced at generation time (e.g. client-side filters instead of server-side, raw FK text instead of interactive popovers, missing cross-navigation), and (C) enhancement opportunities — features the write-time checklists say should be present but were not generated. Separate from defects.
+>
+> **7  -  Intent review** (conversational, requires your original prompt)
+> If you have the text of your original requirement (what you typed to generate this app), I can parse it into atomic requirements and trace each one through every derived document and into the implementation, identifying anything that was dropped, misinterpreted, or simplified without being documented. Different from 5  -  this catches things that were absent from all derived documents from the beginning, not just things that disappeared part-way through.
+>
+> **8  -  Human usability testing** (depends on your availability)
+> I generate a printable task sheet with plain-language questions. You (or a colleague) try each task in the running app and report back answers and difficulty ratings. I compare the answers against correct values fetched directly from the database, raise defects for wrong or hard-to-find answers, and produce a summary. Finds the gap between what the app technically does and what a real user can actually accomplish. You choose the scope: quick spot-check (5-10 tasks), standard review (20-30), or comprehensive (all tasks). Always the last step so the app is in the best possible state before human time is invested.
 >
 > ---
 >
- > **Shortcuts:**
+> **Shortcuts:**
 >
-> **Full validation  -  report only**  -  runs 1, 2, 3, and 4 in sequence. Records all findings. Makes no code changes. Usability testing is a single pass. Ends with the app URL for manual testing and an offer to generate a human task sheet. Good when you want to understand the full picture before deciding what to act on.
+> **Full automated validation  -  report only**  -  runs 1 through 7 in sequence. All automated. Records all findings across defects, artefact gaps, and improvements. Makes no code changes. Ends with the app URL and an offer for human testing (8). Good when you want the full picture before deciding what to act on.
 >
-> **Full validation  -  fix after review**  -  runs 1, 2, 3, and 4 in sequence. Presents a consolidated defect report at the end, you approve which issues to fix, then all selected fixes are applied in one pass. Usability testing iterates until convergence after fixes are applied. Ends with the app URL and human task sheet offer. *(Recommended  -  default if you just say "full validation".)*
+> **Full automated validation  -  fix after review**  -  runs 1 through 7 in sequence. Presents a consolidated defect report (what is broken) and a separate improvement catalogue (what is missing). You approve which items to fix in one pass. Simulated usability testing iterates until convergence after fixes are applied. Ends with app URL and human testing offer. *(Recommended  -  default if you just say "full validation".)*
 >
-> **Full validation  -  fix as we go**  -  runs 1, 2, 3, and 4 in sequence. Each defect is fixed and verified immediately before moving to the next check. Keeps the app in a clean state throughout. Usability testing iterates until convergence. Ends with the app URL and human task sheet offer. Good when you want the app in the best possible state at every step.
+> **Full automated validation  -  fix as we go**  -  runs 1 through 7 in sequence. Each defect is fixed and verified immediately when found. Improvements presented at the end for a separate approval pass. Good when you want the app in the best possible state at every step.
+>
+> **Complete validation (1-8)**  -  runs all automated checks (1-7) then generates a human task sheet (8). Use when you want both agent-verified and human-verified results in a single session. You will need to be available to run the task sheet.
+>
+> **Static only**  -  runs 1, 5, and 6 together. No browser needed. Complete static picture: code correctness + artefact consistency + improvement opportunities. Useful in [JS] environments or when runtime testing is deferred.
 >
 > ---
 >
-> **Which would you like?** You can pick a number, a combination (e.g. "1 and 2"), or one of the shortcuts above.
+> **Which would you like?** You can pick a number, a combination (e.g. "1 and 5"), or one of the shortcuts above.
 >
 > Not sure? Common starting points:
 > - "Quick sanity check" → **1**
 > - "Does the app work end to end?" → **1 + 2**
-> - "Thorough review before handoff" → **Full validation with correction**
-> - "Can users accomplish their goals?" → **4** (or **5** if you want a human to test it)
+> - "Did the generation miss anything?" → **5 + 6**
+> - "Does the app do what I asked for?" → **7** (provide your original prompt)
+> - "Thorough automated review before handoff" → **Full automated validation**
+> - "Everything, including human testing" → **Complete validation (1-8)**
+> - "Can users accomplish their goals?" → **4** (agent) or **8** (human)
 >
 > Once you have chosen, I will ask one more question about how you want any issues that are found to be handled  -  unless you used a shortcut, in which case that is already decided.
 
@@ -86,32 +107,43 @@ Present this version when no browser MCP server was found.
 > **1  -  Static code checks** (~2 min, no browser needed)
 > Scans all source files without running the app. Catches: deprecated API imports, case-sensitive text filters, raw database IDs shown to users instead of names, invalid icon references, missing or incomplete print CSS, expression syntax errors in XML views, TypeScript compilation errors, UI5 linter findings, and manifest validation errors. This is the recommended first step regardless of browser availability.
 >
-> **5  -  Human usability testing** (depends on your availability)
-> I generate a printable task sheet with questions. You try each task in the running app and report back. I compare your answers against correct values from the database and produce a defect summary. Does not require browser automation on my side.
+> **5  -  Artefact consistency check** (~3 min, no browser needed)
+> Checks that every requirement in the PRD and every entity in the spec made it into the schema, service handlers, and UI. Catches things that were stated in one document but dropped before reaching the implementation. No browser required. Particularly useful in [JS] environments where runtime checks are blocked.
+>
+> **6  -  Improvement catalogue** (~5-10 min, no browser needed)
+> Scans app source against the skill's enterprise-ready rules (ER-N codes). Produces (B) standard violations and (C) enhancement opportunities. Entirely static.
+>
+> **7  -  Intent review** (conversational, requires your original prompt)
+> If you have the text of your original requirement, I trace each item through every derived document into the implementation, identifying what was dropped or misinterpreted.
+>
+> **8  -  Human usability testing** (depends on your availability)
+> I generate a printable task sheet. You try each task in the running app and report back. Does not require browser automation on my side. You choose the scope: quick (5-10 tasks), standard (20-30), or comprehensive (all tasks).
 >
 > ---
 >
 > **More thorough validation is available if a browser server is connected.** The following activities require a live browser and cannot be run now:
 >
- > - **Runtime checks (2)**  -  console errors, network requests, data visibility, navigation correctness
+> - **Runtime checks (2)**  -  console errors, network requests, data visibility, navigation correctness
 > - **Faceted review (3)**  -  systematic element-by-element audit across 8 facets (~8-15 min)
 > - **Simulated usability testing (4)**  -  agent acts as a simulated user completing tasks
-> - **Full validation with correction / Full validation with detection**  -  all of the above in sequence (1 → 2 → 3 → 4)
+> - **Full automated validation**  -  all of the above in sequence (1 → 2 → 3 → 4 → 5 → 6 → 7)
 >
 > To enable these, start one of the following. Note: enabling a browser server may require restarting the session.
-> - Chrome DevTools MCP server (recommended for SAPUI5 apps)
-> - Playwright MCP server
+> - Playwright MCP server (recommended for all app types)
+> - Chrome DevTools MCP server (required for sap.viz VizFrame chart interaction tests)
 > - Firefox DevTools MCP server
 >
-> **Which would you like to run now?** You can choose **1**, **5**, or both. Or let me know once a browser server is available and I will present the full menu.
+> **Which would you like to run now?** You can choose any combination of **1**, **5**, **6**, **7**, **8**, or wait until a browser is available for the full menu.
+>
+> Note: running **1 + 5 + 6** gives you the complete static picture — code correctness + artefact gaps + improvement opportunities — without needing a browser.
 >
 > Once you have chosen, I will ask one more question about how you want any issues that are found to be handled.
 
 ---
 
-If the user selects 2, 3, 4, or a full validation shortcut and Menu B was shown, remind them that a browser server is needed and ask if they want to proceed with option 1 and/or 5 instead, or wait until a browser is available.
+If the user selects 2, 3, 4, or a full automated validation shortcut and Menu B was shown, remind them that a browser server is needed and ask if they want to proceed with the static options (1, 5, 6) instead, or wait until a browser is available.
 
-If the user says "Full validation" without specifying a mode, ask:
+If the user says "Full validation" or "do 1-7" or "do 1-8" without specifying a mode, ask:
 > Which style would you like?
 > - **Report only**  -  find everything, change nothing
 > - **Fix after review**  -  full run first, then you approve what to fix in one batch *(default)*
@@ -123,7 +155,30 @@ If the user selects 3 (faceted review), load `faceted-review.md` before starting
 
 If the user selects 4 (simulated usability testing), load `testing-protocol.md`. If `testing/Clicky.md` does not exist, run task suite generation first (ask the user: "What is this app for and who uses it?" before generating).
 
-If the user selects 5 (human usability testing), generate the task sheet from `testing/Clicky.md` (or generate Clicky.md first if absent) and present it to the user before proceeding.
+If the user selects 5 (artefact consistency check): load `product-requirements-document.md`, `intent.md`, `specification/`, `db/schema.cds`, `srv/*.js`, and the app source. Run SV-10. Present findings as FAIL (requirement stated, implementation absent) and FAIL-PARTIAL (read-only where manage is required).
+
+If the user selects 6 (improvement catalogue): load `enterprise-ready.md`. Run the "Generate improvement catalogue" task from SKILL.md. Present output in two sections: (B) standard violations with ER-N codes, (C) enhancement opportunities. Write findings to `testing/improvements.md`. Ask user which items to implement.
+
+If the user selects 7 (intent review): ask the user to provide or paste their original intent prompt. Follow the "Review implementation against original intent prompt" task steps in SKILL.md.
+
+If the user selects 8 (human usability testing): ask the following sizing questions before generating the task sheet:
+> **Human test sheet sizing — please answer three questions:**
+>
+> **1. Scope** — how many tasks should the sheet include?
+> - **Quick** (5-10 tasks): one task per key entity, covering the most critical user paths. Good for a rapid sanity check or when tester time is limited to 15-20 minutes.
+> - **Standard** (20-30 tasks): covers all Tier 1 KPI reads, key Tier 2 filters, one detail per entity, and the primary Tier 4 status transitions. Typical session: 45-60 minutes.
+> - **Comprehensive** (all Clicky.md tasks): complete coverage including Chains and Negatives. Typical session: 90-120 minutes. Best when a dedicated tester is available.
+>
+> **2. Tiers to include** — which task types?
+> - **KPI + actions only** (Tier 1 + Tier 4): fast check of counts and core write operations
+> - **All read tiers** (Tier 1 + 2 + 3): verifies data is visible and navigable, no write operations
+> - **All tiers** (default): reads, writes, chains, negatives
+>
+> **3. Answer visibility** — should the sheet show the expected answers?
+> - **Blind** (questions only — default): tester does not see the correct answer. Use for genuine usability testing. Detects what is actually hard to find.
+> - **Guided** (questions + directional hints): tester knows the area to look in but not the exact answer. Faster, less realistic.
+>
+> Default if not specified: Standard scope, all tiers, blind. Generate the task sheet and present it once sizing is confirmed.
 
 If the user says "full validation with corrections" or uses the word "corrections" without specifying timing, treat this as ambiguous and ask [verified TrialK-2026-06-02]:
 > "By 'corrections'  -  did you want me to:
@@ -132,7 +187,7 @@ If the user says "full validation with corrections" or uses the word "correction
 >
 > Both modes fix everything; the difference is when."
 
-For combined selections (e.g. 1 + 2), run in numeric order. After each activity completes, present its findings and ask before proceeding to the next.
+For combined selections (e.g. "1 and 5"), run in numeric order. After each activity completes, present its findings and ask before proceeding to the next.
 
 **Full validation shortcut execution:**
 1. Run activity 1 (static checks)  -  present findings
@@ -147,8 +202,13 @@ For combined selections (e.g. 1 + 2), run in numeric order. After each activity 
    - **Fix after review** (after fixes applied) or **Fix as we go**: full iterative loop  -  fix between runs, retest until convergence or 10 iterations
    - If no task suite (`testing/Clicky.md`) exists, generate one first: ask "What is this app for and who uses it?" before proceeding
    - **The same task suite runs every iteration**  -  do not regenerate tasks between runs. When a defect is found, check for two augmentation triggers before the next iteration: (1) does any existing task cover this defect? If not, add one. (2) Does this defect reveal a pattern that could affect other pages, entities, or controls not yet covered by any task? If so, add tasks for those too. See `testing-protocol.md §4` for examples.
-6. Provide the app's running URL for manual testing  -  confirm from the CAP server (e.g. `http://localhost:4004/<app-namespace>/index.html`) and present it clearly
-7. Offer: "Would you like me to generate a task sheet for human testing? I can create a set of plain-language questions you can try in the app yourself." If yes, run activity 5.
+6. Run activity 5 (artefact consistency check, SV-10)  -  present FAIL and FAIL-PARTIAL findings
+7. Run activity 6 (improvement catalogue)  -  present Section B and Section C findings separately from defects. Write to `testing/improvements.md`. Ask which improvements to implement (separate from the defect fix pass). Reason: improvements are not broken things — they are quality gaps. The user decides whether to invest in them after seeing the defect state is resolved.
+8. Provide the app's running URL for manual testing  -  confirm from the CAP server and present clearly
+9. Offer human usability testing (activity 8): "Would you like me to generate a human test sheet? I will ask you three questions about scope, tiers, and answer visibility before generating it. This is the last step so the app is in its best possible state before human time is invested."
+   If yes: ask the three sizing questions (scope / tiers / answer visibility) defined in the routing rules above, then generate the task sheet.
+
+**If the user said "do 1-8":** This maps to the full automated validation (1 through 7) followed by human testing (8). Run 1-7 autonomously, then pause and ask the sizing questions for step 8 before generating the task sheet.
 
 Once the activity selection is confirmed, ask the defect handling question before starting any work:
 
@@ -176,6 +236,10 @@ Do NOT start any activity before both questions (activity selection AND defect m
 Run all checks in order. After each group, report findings before proceeding. Stop a group and report if a finding would invalidate later checks (e.g. a package.json missing deps means the app cannot start - report and ask to fix before continuing).
 
 ### SV-0: Pre-delivery static grep gate
+
+**Fast-exit for vanilla JS projects:** If the running app is vanilla JS (no `.ts`/`.tsx` source files in the project, or the app is served from a pre-built `index.html` with no React source tree contributing to the live output), skip the TypeScript/React-specific patterns below (all grep patterns targeting `.ts`/`.tsx`) and proceed directly to SV-7 (print views), SV-8 (string quality), and SV-9 (field-level sweep) against the HTML/JS source. DV checks remain mandatory regardless of technology.
+
+To determine which version is running, use the framework identity check in DV-1.
 
 Run these targeted greps before any other check. Each finds a specific class of error that static analysis tools do not catch. All must return zero matches:
 
@@ -269,6 +333,28 @@ Select-String -Path "**/*.tsx","**/*.ts" -Pattern "\?\? '--'" -Recurse
 ```
 
 > These checks are mechanical - zero-match is a hard requirement, not a guideline. Run them before running linter or manifest validation.
+
+**Seed data UUID format check (run for any project with `: cuid` entities):**
+
+```powershell
+# For each CSV in db/data/, check whether the ID column values look like UUIDs.
+# A UUID is 8-4-4-4-12 hex chars (e.g. "550e8400-e29b-41d4-a716-446655440000").
+# A non-UUID is anything shorter (e.g. "ap001", "w001", "c001").
+$csvFiles = Get-ChildItem "db/data/*.csv" -ErrorAction SilentlyContinue
+foreach ($f in $csvFiles) {
+    $firstDataLine = Get-Content $f | Select-Object -Skip 1 -First 1
+    if (!$firstDataLine) { continue }
+    $firstId = $firstDataLine.Split(',')[0].Trim('"')
+    $isUuid = $firstId -match '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+    if (!$isUuid) {
+        Write-Host "WARN: $($f.Name) uses non-UUID ID '$firstId' - check if entity uses : cuid"
+    }
+}
+# Cross-check: each entity in db/schema.cds with ': cuid' requires UUID IDs in its seed CSV
+Select-String -Path "db/schema.cds" -Pattern ": cuid" -Recurse
+```
+
+Any WARN output here paired with a `: cuid` schema match = BLOCKING pre-flight failure. Fix: run the write-path PATCH check from `cap-shared.md §1` before writing any UI write code. See `cap-shared.md §3.2` for the full explanation and fix options.
 
 ---
 ### SV-1: Package.json and dependency completeness
@@ -483,9 +569,86 @@ Tooltip content rules:
 
 ---
 
+### SV-10: Artefact-to-artefact consistency
+
+**When to run:** On any project that has a `product-requirements-document.md` (PRD) or `intent.md`. No browser required. No original prompt required. Run after SV-9.
+
+**What this catches:** Requirements that were stated in derived documents (PRD, intent.md, spec) but were dropped or left unimplemented downstream. This is distinct from SV-0 through SV-9 which check code patterns — SV-10 checks semantic completeness.
+
+**Check 1 — Every FR has a corresponding implementation:**
+
+For each FR in `product-requirements-document.md`:
+- [ ] The FR maps to at least one entity/field in `db/schema.cds` OR a handler in `srv/*.js` OR a UI element in the app source
+- [ ] If the FR uses a verb like "manage", "create", "edit", "configure": a Create form AND an Update form exist in the UI for the referenced entity. Read-only display without edit capability is FAIL-PARTIAL.
+- [ ] If the FR says "auto-generate" or "auto-create": verify a corresponding AFTER handler exists in `srv/*.js`. If absent, raise as FAIL.
+
+**Check 2 — Every AFTER handler side effect is visible in the UI:**
+
+For each `srv.after(...)` handler in `srv/*.js`:
+- [ ] Identify what entity/field the handler creates or updates
+- [ ] Verify that entity is accessible in at least one UI view
+- [ ] Verify the value produced by the handler (e.g. a computed fee, an auto-created record) is rendered in the UI — not just returned by the API
+
+**Check 3 — Every API function's return fields are rendered in the UI:**
+
+For each OData function (e.g. `getDailySchedule`, `getValidSlots`) defined in `srv/*.cds`:
+- [ ] Enumerate every field in the function's return type
+- [ ] Verify each field is rendered in the corresponding UI view
+- [ ] Fields present in the return type but absent from the UI rendering are flagged as FAIL
+
+**Check 4 — Every entity with a Composition has a management UI:**
+
+For each `Composition of many` in `db/schema.cds`:
+- [ ] The child entity has a UI to create and delete child records
+- [ ] If absent: check whether `intent.md` or `specification.md` explicitly marks it as out-of-scope. If no such note exists: FAIL-PARTIAL.
+
+**Check 5 — Every "manage" verb in intent.md has full CRUD in the UI:**
+
+Grep `intent.md` for management verbs (manage, configure, set, define, register):
+```powershell
+Select-String -Path "intent.md" -Pattern "\b(manage|configure|set|define|register|edit|update)\b"
+```
+For each match referencing a named entity: verify the UI has both a create form and an edit/update mechanism for that entity.
+
+**Operational procedure:**
+
+```
+1. Read product-requirements-document.md. List all FR items.
+2. For each FR: search schema.cds and srv/*.js and app source for the corresponding
+   implementation element. Record: present/absent/partial.
+3. Read intent.md. Extract all management verbs + referenced entities.
+4. For each management verb: verify UI has create + edit forms.
+5. Read srv/*.js. List all srv.after() handlers and their side effects.
+6. For each side effect: verify it is visible in the UI.
+7. Read srv/*.cds. List all function return type fields.
+8. For each function: verify all returned fields are rendered in the UI.
+9. Report: FAIL items (requirement stated, implementation absent),
+           FAIL-PARTIAL items (read-only where write is required),
+           PASS items (fully implemented).
+```
+
+**Note on JS/JS-LOCAL projects:** In Joule Studio, all project artefacts (intent.md, PRD, spec, schema, handlers, UI) are generated from a single user prompt. SV-10 is especially important for these projects because the entire pipeline from requirements to code is automated — gaps can be introduced at any translation step without the user's knowledge. SV-10 is fully executable in [JS] and [JS-LOCAL] environments (no browser required).
+
+---
+
 ## DV - Dynamic Validation
 
-Requires: Chrome DevTools MCP connected, app server running, CAP backend running with data.
+**Browser tool selection for all DV checks:**
+- **Use Playwright MCP by default** for: `browser_navigate`, `browser_snapshot`,
+  `browser_take_screenshot`, `browser_click`, `browser_network_requests`,
+  `browser_network_request`, `browser_console_messages`, `browser_evaluate`,
+  `browser_type`, `browser_fill_form`
+- **Use Chrome DevTools MCP** only for: sap.viz VizFrame chart click interactions
+  (D3 event listeners are not triggered by accessibility-tree clicks; require
+  `page.mouse.click(x,y)` at real viewport coordinates)
+- **Fallback:** If Playwright MCP is unavailable, use Chrome DevTools MCP equivalents
+  (`navigate_page`, `take_snapshot`, `list_console_messages`, `list_network_requests`,
+  `evaluate_script`, `click`)
+
+The DV check instructions below use generic verbs ("navigate", "snapshot", "inspect
+network"). Execute using Playwright unless a Chrome DevTools MCP exception is noted inline.
+
+Requires: Playwright MCP (preferred) or Chrome DevTools MCP connected, app server running, CAP backend running with data.
 
 Run only after all SV checks pass (or all critical SV findings are fixed).
 
@@ -519,6 +682,16 @@ take_screenshot()
 - [ ] App shell is visible - not a blank white page
 - [ ] No loading spinner still running after 10 seconds (indicates a hung OData request)
 - [ ] For FE List Report: table is visible (not showing "To start, set the relevant filters and choose Go" indefinitely) - if so, verify `initialLoad: "Auto"` is set in manifest for analytical apps
+- [ ] **Framework identity verification (mandatory for projects with both a built app and a React source tree):**
+  ```
+  browser_evaluate("() => document.querySelector('#root') ? 'React' :
+                          document.querySelector('#app')  ? 'Vanilla-JS' : 'unknown'")
+  ```
+  For projects with `src/` React source AND a pre-built `index.html`:
+  - If `#root` found → the Vite-built React bundle is being served. Static checks (SV-0 through SV-9) apply to `src/` files.
+  - If `#app` found → the vanilla JS `index.html` is being served, NOT the React build. Static checks targeting `.ts`/`.tsx` files (SV-0 through SV-6) are NOT applicable to this running version. SV-8 and SV-9 apply to the HTML source.
+  - If result is `'unknown'` for a project that has a defined mount point: raise as a defect — the app may not be initialising.
+  Misidentifying which version is running invalidates all source code analysis that follows. Fix: run `npm run build` in the React app folder and verify the CDS serves from `dist/`.
 
 ---
 
@@ -581,6 +754,26 @@ For every OData request:
 - [ ] Draft entity list requests include `IsActiveEntity%20eq%20true` or `IsActiveEntity eq true` in the URL
 - [ ] No absolute `http://localhost:PORT` in any OData request URL - all must be root-relative (proxy)
 - [ ] No `%24filter` in any URL (URLSearchParams encoding trap - `$` must not be percent-encoded)
+
+**Write-path smoke test (BLOCKING — run before DV-5):**
+
+Before completing DV-4, trigger at least one write operation for each entity type the app exposes. Minimum set: click one status-transition button (Confirm / Mark Paid / etc.) if present; click Edit on one row and submit without changes; if a Create form exists, open it and cancel.
+
+After each action, inspect the network log using Playwright:
+```
+browser_network_requests(filter='/api/<EntitySet>', static=false)
+# Get the index of the most recent PATCH/POST/DELETE
+browser_network_request(index=<N>, part='response-body')
+```
+
+Assert: the most recent PATCH/POST/DELETE returned HTTP 200 (PATCH/PUT), 201 (POST), or 204 (DELETE).
+
+Common HTTP 400 causes:
+- `"does not contain a valid UUID"` → seed data ID mismatch (cap-shared.md §3.2) — **BLOCKING, fix before any further testing**
+- `"Value is required"` → FK field name mismatch (admin vs browse service)
+- `"Integrity constraint"` → missing required FK
+
+A write returning HTTP 400 while the UI shows no error (error caught and swallowed by `toast()`) is a BLOCKING defect. The UI appears functional but all mutations fail from the user's perspective. This check MUST pass before DV-5 — a write-path failure makes all data correctness checks meaningless.
 
 ---
 

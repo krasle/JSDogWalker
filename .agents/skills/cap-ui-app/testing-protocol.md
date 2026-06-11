@@ -122,15 +122,314 @@ The executable task suite. Generated once, reused across all test runs. The form
 
 Augmentation adds coverage; it does not replace existing tasks. Record the new task IDs in the relevant defect entries in `defects.md`.
 
-**Task mix requirement:** A well-formed Clicky suite for a 4-page app must include:
-- At least 8 Tier 1 tasks (KPI reads - fast sanity checks, re-run every iteration)
-- At least 8 Tier 2 tasks (filtered list navigation)
-- At least 8 Tier 3 tasks (detail drill-down from list)
-- At least 8 Tier 4 tasks (single CRUD or status-transition action)
-- At least 8 Chain tasks (multi-page action sequences - see Tier 5 below)
-- At least 16 negative tasks (things that should NOT be possible or visible)
+---
 
-Chains (Tier 5) are required because they exercise the inter-page state that individual point-tasks cannot catch. A typical 4-page app needs a minimum of 20--25 tasks total; a 4-page multi-app benchmarking run needs 24 positive + 24 negative per use case.
+### Layer 0 - Document grounding (mandatory first step before generating any tasks)
+
+Before generating any tasks, read these documents in order and extract the listed items.
+If any document is absent, raise a defect and ask the user to provide it. Do NOT generate
+a Clicky suite without completing this step.
+
+| Document | Location | Extract |
+|----------|----------|---------|
+| `intent.md` | project root | User roles, use cases, business context |
+| `product-requirements-document.md` | project root | FR-NN list, acceptance criteria |
+| `specification/<asset>/specification.md` | project root | Entity schema, status values, service handlers, side effects |
+| `solution.yaml` | project root | Asset names, service path |
+| `assets/<name>/asset.yaml` | asset root | Service port, endpoint paths |
+
+**[JS] / [JS-LOCAL] projects:** All five documents above MUST be present. The `solution.yaml`
+and `asset.yaml` confirm the asset type and service path. A JS project without specification
+documents cannot have a valid Clicky suite - the spec is the ground truth for what the app
+is supposed to do, not just what it visually appears to do.
+
+From the specification, extract:
+- All entities and their writable fields
+- All status fields and their complete set of valid values
+- All auto-create side effects (e.g. "AFTER CREATE X -> creates Y")
+- All validation rules (slot validation, double-booking, required fields)
+- All computed values (fee formulas, derived fields)
+- Seed data counts per entity (used to verify KPI totals in Tier 1)
+
+Record the FR-to-task mapping in `testing/test-plan.md` as part of generation. Every
+testable FR must have at least one task. FRs not testable in the UI (covered by unit tests)
+must be noted as "covered by unit test: <file>".
+
+---
+
+### Layer 1 - Entity lifecycle matrix (mandatory, derive from specification)
+
+Before writing individual tasks, build an entity lifecycle matrix. For every writable
+entity in the service, mark which operations exist and require coverage:
+
+```
+Entity          | Create | Read | Update | Delete | Status transitions
+----------------|--------|------|--------|--------|-------------------
+[EntityName]    | T4     | T1/2 | T4     | T4     | [list transitions]
+```
+
+Rules:
+- Every non-empty cell requires at least one task.
+- "Auto-create" entities (created by backend handler, not user) require a Chain task
+  verifying the auto-create fires and produces correct values.
+- Every valid status transition listed in the spec requires a Tier 4 task.
+- Every invalid transition (e.g. confirming a cancelled record) requires a Negative task.
+- Status transitions that trigger side effects (e.g. confirm -> creates Confirmation record)
+  require a Chain task verifying the side effect.
+
+---
+
+### Layer 2 - Network assertion in Tier 4 and Chain tasks (mandatory)
+
+Every Tier 4 task and every Chain task MUST include a network verification step.
+The network assertion takes precedence over the UI outcome.
+
+**Add these fields to every Tier 4 and Chain task:**
+
+```
+- **Network assertion:** METHOD /api/<EntitySet> -> HTTP <expected-code>
+  (e.g. PATCH /api/Appointments -> HTTP 200)
+- **Network verification step:**
+  Tool: browser_network_requests (Playwright preferred) or list_network_requests (Chrome DevTools MCP)
+  After clicking the action: assert the most recent PATCH/POST/DELETE returned <expected-code>.
+  PASS only if both UI outcome AND network assertion are correct.
+  FAIL-WRONG if network shows unexpected code, even if UI appears correct.
+```
+
+**The non-UUID write-path check (add to every new project's Negative suite):**
+
+This task MUST be included in the negative suite of every project using `: cuid` entities.
+It is a pre-flight API check, not a UI task:
+
+```
+### T-NEG-API-write-path
+- Tier: Negative (API pre-flight)
+- Description: Verify write operations succeed against seed data IDs. If this fails,
+  ALL Tier 4 tasks will be FAIL-BLOCKED and there is a single root cause to fix.
+- Question: Does PATCH /api/<PrimaryEntity>(ID='<first-seed-id>') return HTTP 200?
+- Method: Execute via browser_evaluate or direct fetch before any UI interaction:
+    fetch('/api/<PrimaryEntity>(ID=\'<first-seed-id>\')', {
+      method: 'PATCH',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({<any-non-required-field>: <current-value>})
+    }).then(r => r.status)
+- Correct answer: HTTP 200 (seed IDs are valid UUIDs and writes succeed)
+- Failure answer: HTTP 400 "does not contain a valid UUID" (seed IDs are not UUIDs)
+- If FAIL: raise as BLOCKING defect. Root cause: seed data uses non-UUID IDs but
+  entity declares ': cuid'. Fix: replace all seed IDs with UUIDs across all CSV files.
+  Do NOT proceed with Tier 4 UI testing until this is resolved - all writes will fail.
+- Note: Run this as the FIRST task in every iteration. A FAIL here explains all
+  subsequent Tier 4 FAIL-BLOCKED results without needing to test them individually.
+```
+
+---
+
+### Layer 3 - Chain task structural categories (mandatory)
+
+A chain suite that is numerically above the minimum but missing structural categories is incomplete. Every chain suite MUST include at least one task from each of the five categories below. Enumerate the categories from the spec before writing any individual chain tasks.
+
+**Category A — Side-effect verification (one per AFTER handler)**
+
+For every `AFTER CREATE`, `AFTER UPDATE`, or `AFTER DELETE` handler in `srv/*.js`, generate one chain that:
+1. Triggers the handler (with network assertion: expected HTTP code)
+2. Fetches the side-effect entity and asserts correct field values (not just existence)
+
+If a single trigger fires multiple independent side effects (e.g. creates both a BillingRecord and a Confirmation), each side effect needs its own verification step within the chain — they are not interchangeable and may fail independently.
+
+**Category B — Computed value change propagation (both directions)**
+
+For every field whose value is computed from a relationship count or aggregation (identified from the spec formula section), generate chains verifying:
+- B1: Value is correct at creation time with N items
+- B2: Value recalculates correctly when an item is **added** after creation (N → N+1, value increases)
+- B3: Value recalculates correctly when an item is **removed** after creation (N+1 → N, value decreases)
+
+B2 and B3 are separate chains because they exercise different handler code paths (AFTER CREATE vs AFTER DELETE on the junction entity). Omitting either direction leaves a recalculation handler untested.
+
+**Category C — Full lifecycle sequence (one per entity with status transitions)**
+
+For every entity that has a status field with multiple valid transitions, generate one chain that exercises the **complete status sequence** from initial to terminal state:
+- Assert the correct HTTP code after each transition
+- Assert the UI reflects the new state without requiring manual page reload
+- Assert any dependent entities updated correctly after each transition
+
+This is the only chain type that catches state-transition **ordering** failures — where a correct individual transition breaks a subsequent one (e.g. a billing record created correctly at booking but failing to update when the appointment is later confirmed).
+
+**Category D — Cross-entity data consistency (one per FK shown in the UI)**
+
+For every FK relationship that is visibly resolved in the UI (walker name on appointment row, customer name on billing row, etc.), generate one chain that:
+1. Modifies the referenced entity (PATCH the name/title/label field)
+2. Navigates to the referencing entity's list view
+3. Asserts the change is visible without a manual cache clear or page reload
+
+This catches stale-cache bugs and reveal whether the app re-fetches or relies on in-memory maps.
+
+**Category E — Referential integrity (one per Composition in the schema)**
+
+For every `Composition of many` relationship in `db/schema.cds`, generate one chain that:
+1. Creates a parent entity (UUID-based)
+2. Creates a child entity linked to that parent
+3. Deletes the parent
+4. Asserts the outcome matches schema intent:
+   - CDS Composition: child cascades; assert child count decreases
+   - CDS Association (non-Composition): assert CAP rejects with a constraint error
+
+This catches mismatches between the declared schema semantics and actual runtime behaviour.
+
+---
+
+**Chain count formula (structural + density):**
+
+After enumerating the 5 categories, the minimum chain count is:
+
+```
+A = H (one per AFTER handler)
+B = 2 × F_computed (add + remove per computed field)
+C = E_status (one per entity with status transitions)
+D = F (one per visible FK relationship)
+E = Comp (one per Composition relationship in schema)
+
+Structural minimum = A + B + C + D + E
+Density minimum    = max(H + 2*E_entities, 8)   [from the scaling table]
+Required minimum   = max(Structural minimum, Density minimum)
+```
+
+If the structural enumeration gives a lower number than the density formula, the formula wins — it means some categories have more instances than enumerated. If the structural enumeration gives a higher number, use that — it reflects the actual spec surface.
+
+---
+
+**Task count is derived from spec coverage, not from meeting tier minimums.**
+
+The tier minimums below are floors — they prevent undersized suites on large apps.
+A complete suite will exceed them. The correct method:
+
+1. Extract the following variables from the Layer 0 documents:
+   - **E** = number of writable entities exposed in the service (Layer 1 matrix rows)
+   - **S** = total distinct status values across ALL status fields in ALL entities
+   - **H** = number of AFTER CREATE/UPDATE handlers (auto-create side effects from srv/*.js)
+   - **V** = number of named validation rules (HTTP 400/409 reject conditions)
+   - **F** = number of FK relationships that are visibly resolved in the UI (e.g. walker name shown on appointment row, customer name on billing row)
+   - **T** = number of field-level validation rules across all entities (required fields, format checks, range/enum constraints from CDS schema)
+   - **UC** = number of distinct user roles × use cases in intent.md (each role×use-case pair is one scenario)
+
+2. Apply the entity-scaled minimums per tier:
+
+| Tier | Formula | What it covers |
+|------|---------|---------------|
+| Tier 1 - KPI/count reads | max(2×E + S, 10) | 2 count/display reads per entity (total count + at least one content read), 1 per status value |
+| Tier 2 - Filtered list | max(2×E + S + F, 10) | 2 filtered views per entity, 1 per status value, 1 per FK display to verify names resolve correctly |
+| Tier 3 - Cross-entity detail | max(2×E, 8) | 2 cross-entity navigations per entity (FK relationship + computed/derived field) |
+| Tier 4 - CRUD + field validation + transitions | max(4×E + T + S, 16) | Create+Read+Update+Delete per writable entity (4 per E), 1 per field-level validation rule, 1 per valid status transition |
+| Chain - technical side effects | max(H + 2×E, 8) | 1 per auto-create handler, 2 cross-entity write propagation chains per entity |
+| Scenario - business workflows | max(UC, 4) | **NEW TIER** - 1 full end-to-end scenario per use case in intent.md. These cannot be decomposed into individual point tasks — they test whether a user can complete a complete business operation from start to finish across multiple entities and views. See §4a below. |
+| Negative - blocked paths + field validation | max(V + E + T + S, 16) | 1 per named validation rule, 1 per entity missing-required-field, 1 per field-level constraint, 1 per invalid status transition |
+| Pre-flight | 1 | Always exactly 1 write-path UUID pre-flight |
+
+3. After generating the suite, verify all assertions:
+
+```
+Assert all of:
+  Tier1    >= max(2*E + S,         10)
+  Tier2    >= max(2*E + S + F,     10)
+  Tier3    >= max(2*E,              8)
+  Tier4    >= max(4*E + T + S,     16)
+  Chain    >= max(H + 2*E,          8)
+  Scenario >= max(UC,               4)
+  Negative >= max(V + E + T + S,   16)
+  Preflight = 1
+
+If any assertion fails: identify the missing entity/status/handler/use-case
+and add the corresponding tasks before declaring the suite complete.
+```
+
+**Typical task count by app size:**
+
+| App size | E | S | H | V | F | T | UC | Approx total |
+|----------|---|---|---|---|---|---|----|--------------|
+| Small (3-4 views, 4 entities) | 4 | 4 | 1 | 2 | 3 | 5 | 2 | ~60 |
+| Medium (5-7 views, 8 entities) | 8 | 7 | 2 | 4 | 6 | 8 | 4 | ~130 |
+| Large (8+ views, 12+ entities) | 12 | 12 | 4 | 6 | 10 | 15 | 6 | ~220 |
+
+---
+
+### §4a - Scenario tier: full business workflows from intent.md
+
+**What a Scenario task is:**
+
+A Scenario task covers a complete user journey from a cold start (no pre-existing session
+state) to a successful business outcome. It crosses multiple entities, multiple views, and
+multiple operation types in a single task. It cannot be replaced by a collection of Tier 4
+and Chain tasks — it tests the transitions between operations, the state carried forward
+from one step to the next, and the coherence of the end result.
+
+**How to derive Scenario tasks from the intent document:**
+
+For each use case in intent.md, ask:
+  "What does a user of this role need to do, from nothing, to complete this goal?"
+
+The answer is one Scenario task. Write it as a numbered sequence of steps, each with its
+own success criterion and network assertion where a write occurs.
+
+**Common scenario patterns — apply these to the actual domain:**
+
+These patterns recur across most CAP apps. For each pattern, substitute the domain entities
+from the project's spec. Do not use these as templates with domain-specific names filled in
+— derive the steps from the intent document and service handlers.
+
+Pattern A - Entity onboarding chain (new master data setup)
+  Intent: Register a new [primary entity] with its [dependent entities] so the system
+          can use it in operations.
+  Structure: Create [primary entity] -> add [dependent entity 1] -> add [dependent entity 2] ->
+             verify [primary entity] appears in list with [dependent entities] shown ->
+             verify [primary entity] is available in [related entity] dropdown
+
+Pattern B - Full operational lifecycle (create -> status transitions -> settlement)
+  Intent: Execute a complete business operation from initial booking/creation through
+          all status transitions to final settlement (payment, closure, archival).
+  Structure: Create [operational entity] -> verify [auto-created side effect] ->
+             transition to [intermediate status] -> verify [status-driven side effect] ->
+             transition to [terminal status] -> verify [settlement record] updated ->
+             verify [summary view] reflects final state
+
+Pattern C - New operator onboarding (resource setup + constraint verification)
+  Intent: Set up a new [resource entity, e.g. walker, agent, employee] and verify
+          they can be used in operations and that their constraints are respected.
+  Structure: Create [resource entity] -> configure [availability/capacity/settings] ->
+             verify [resource entity] appears in [operational entity] creation dropdowns ->
+             create [operational entity] using the new [resource entity] ->
+             attempt to violate [resource constraint] -> verify rejection
+
+Pattern D - Multi-item operation with computed value verification
+  Intent: Create an [operational entity] with multiple [line items / associated entities]
+          and verify that computed values (totals, fees, aggregates) are correct at each step.
+  Structure: Create [operational entity] with N [line items] ->
+             verify computed value at N -> add another [line item] ->
+             verify computed value updates to N+1 count ->
+             verify [auto-created record] reflects final computed value
+
+Pattern E - Conflict detection and graceful recovery
+  Intent: Demonstrate that the system correctly rejects invalid operations and allows
+          the user to recover and complete a valid operation.
+  Structure: Identify an existing [constraint context] (e.g. existing booking for resource X at time Y) ->
+             attempt to create a conflicting [operational entity] -> verify HTTP 409/400 + error message ->
+             modify the request to remove the conflict -> verify successful creation (HTTP 201) ->
+             verify both [original entity] and [new entity] coexist correctly
+
+**Scenario tasks for the current project are generated by applying these patterns to the
+use cases in intent.md.** Record them in testing/Clicky.md under the SC-N prefix.
+
+The value of Pattern B specifically: it is the only task type that covers the full entity
+lifecycle in sequence. Individual Tier 4 tasks cover each transition in isolation, but
+Pattern B catches state-transition dependencies — e.g. a side-effect record created correctly
+at the initial step but failing to update when a later transition fires, or a computed value
+that is correct at creation but stale after a modification.
+
+---
+
+Chains (Tier 5) are required because they exercise the inter-entity write propagation that
+individual point-tasks cannot catch. Scenario tasks (§4a) are required because they exercise
+the full user-visible business workflow that isolated chains cannot catch. A suite without
+Scenarios can have all individual tasks passing while a complete business workflow fails
+at a state-transition boundary.
 
 ```markdown
 # Task Suite - [App name]
@@ -154,6 +453,24 @@ Chains (Tier 5) are required because they exercise the inter-page state that ind
 - **Last result:** [PASS / FAIL-BLOCKED / FAIL-WRONG / FAIL-EXCESSIVE / FAIL-UNCLEAR / not run]
 - **Notes:** [optional: context, edge cases, known issues]
 
+### T-NNN (Tier 4 example - CRUD/status transition)
+- **Use case:** UC-02
+- **Role:** [Role name]
+- **Tier:** 4
+- **Description:** Confirm a scheduled appointment and verify the status changes.
+- **Question:** After clicking Confirm on a scheduled appointment, does the status change to
+  "confirmed" in the list AND does the network log show HTTP 200?
+- **Correct answer:** Appointment status = "confirmed" in list. Network: PATCH -> HTTP 200.
+  (verified: PATCH /api/Appointments(ID='<uuid>') {"status":"confirmed"} -> HTTP 200)
+- **Expected path:** Appointments view -> find scheduled appointment -> click Confirm
+- **Network assertion:** PATCH /api/Appointments -> HTTP 200
+- **Network verification step:** After click, run browser_network_requests (Playwright) or
+  list_network_requests (Chrome DevTools MCP). Assert most recent PATCH returned HTTP 200.
+  If HTTP 400: FAIL-WRONG, raise defect. Check response body for "not a valid UUID" (D-019
+  class) or other error message.
+- **Success criteria:** Status badge shows "confirmed". Confirm button gone. PATCH = HTTP 200.
+- **Last result:** [not run]
+
 ### T-NNN (Chain example)
 - **Use case:** UC-03
 - **Role:** Travel Manager
@@ -164,9 +481,11 @@ Chains (Tier 5) are required because they exercise the inter-page state that ind
   2. Sort by TotalPrice descending -> note the top record ID and description
   3. Click that record -> verify detail page opens with correct ID
   4. Click Edit -> change Description to "Updated by test [timestamp]" -> click Save
-  5. Verify success toast -> click Back -> verify list shows the updated description in that row
+  5. Network assertion: PATCH /api/Travels -> HTTP 200
+  6. Verify success toast -> click Back -> verify list shows the updated description in that row
 - **Correct answer at step 2:** [record ID, e.g. 4133] (verified: GET /odata/v4/travel/Travels?$filter=Status_code eq 'A' and IsActiveEntity eq true&$orderby=TotalPrice desc&$top=1)
-- **Correct answer at step 5:** Description in list row equals "Updated by test [timestamp]"
+- **Correct answer at step 5:** HTTP 200 from PATCH (network log)
+- **Correct answer at step 6:** Description in list row equals "Updated by test [timestamp]"
 - **Expected pages visited:** Overview, Travels list (filtered), Travel detail, Travels list (return)
 - **Last result:** [not run]
 
@@ -506,6 +825,14 @@ LOOP:
      - Execute ALL Chain tasks (§4 Tier 5) - these are non-optional
      - Record each task result: PASS / FAIL-xxx
      - For each FAIL: raise defect to defects.md with ID, description, root cause
+     - **NEVER mark a task NOT RUN because its root cause is already known.** A task
+       that fails for a known root cause is still scored FAIL-WRONG with the root cause
+       noted. Rationale: tasks sharing a stated root cause often reveal additional defect
+       dimensions not visible from the first failure (e.g. a POST body FK validation gap
+       discovered while testing what appeared to be a simple key-predicate failure). The
+       complete FAIL count is the honest measure of app quality. NOT RUN is reserved
+       exclusively for tasks that cannot be mechanically executed: server unreachable,
+       login dialog blocking all navigation, test environment unavailable.
 
   3. After all tasks complete:
      - Count newly-introduced defects (defects found in THIS iteration that were not in the previous)

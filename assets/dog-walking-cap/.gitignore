@@ -16,6 +16,9 @@ mta_archives/
 *_mta_build_tmp
 *.mtar
 
+# Runtime logs
+cds-watch.log
+
 # Other
 .DS_Store
 

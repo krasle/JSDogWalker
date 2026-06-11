@@ -42,7 +42,8 @@ This skill is designed to work **with or without** the SAP MCP servers. Use this
 | `fiori_get_functionality_details` | **Step 2 of 3** - get parameters for a Fiori tools operation | Same fallback |
 | `fiori_execute_functionality` | **Step 3 of 3** - execute a Fiori tools operation (add annotation, add page, etc.) | Edit `manifest.json` and annotation `.cds` files manually following the patterns in `fiori-elements.md` |
 | `fiori_search_docs` | Search Fiori/annotations documentation | Consult `https://sapui5.hana.ondemand.com/sdk/#/topic/` |
-| Chrome DevTools MCP (`navigate_page`, `take_screenshot`, `list_console_messages`) | Runtime verification - open app in browser, screenshot it, check console errors | Use `curl -s -o /dev/null -w "%{http_code}" http://...` (macOS/Linux) or `Invoke-WebRequest` (Windows) for HTTP 200 checks; open browser manually for visual verification |
+| Playwright MCP (`browser_navigate`, `browser_take_screenshot`, `browser_console_messages`, `browser_network_requests`, `browser_snapshot`, `browser_evaluate`, `browser_click`) | **Preferred** browser tool for all runtime verification - navigate app, screenshot, check console errors, inspect network requests | Use `curl -s -o /dev/null -w "%{http_code}" http://...` (macOS/Linux) or `Invoke-WebRequest` (Windows) for HTTP 200 checks; open browser manually for visual verification |
+| Chrome DevTools MCP (`navigate_page`, `take_screenshot`, `list_console_messages`, `list_network_requests`, `evaluate_script`, `click`) | Fallback browser tool, and primary tool for sap.viz VizFrame chart interaction tests (D3 event listeners require real coordinate clicks not accessibility-tree clicks) | Same CLI fallback as Playwright row above |
 
 **When all MCP tools are available (Fiori Elements / SAPUI5 workflow):**
 1. Call `ui5_get_guidelines` first - always, before any generation or edit
@@ -50,7 +51,7 @@ This skill is designed to work **with or without** the SAP MCP servers. Use this
 3. Call `fiori_list_functionality` -> `fiori_get_functionality_details` -> `fiori_execute_functionality` for Fiori Elements operations
 4. Call `ui5_create_ui5_app` for freestyle SAPUI5 scaffolding
 5. Call `ui5_run_ui5_linter` and `ui5_run_manifest_validation` as gates after every change
-6. Use Chrome DevTools MCP for runtime verification
+6. Use **Playwright MCP** for runtime verification (preferred); Chrome DevTools MCP as fallback or for sap.viz chart interaction tests
 
 **When MCP tools are not available:**
 - All the same rules apply - substitute the CLI equivalents and manual file edits listed above
@@ -281,7 +282,47 @@ Load `cap-shared.md` + `cap-ref.md`. Follow Step 1 in detail. Report whether eac
 5. Apply fixes in priority order
 6. Re-run static analysis to confirm zero regressions
 
-### Task: Initialize testing for a project
+### Task: Review implementation against original intent prompt
+
+**Trigger:** User provides their original intent prompt (the text they typed into Joule Studio or described verbally), or says "check what was missed from my requirements", or voices a specific concern about a missing feature.
+
+**When to use this task vs SV-10:**
+- SV-10 (in `validation.md`) checks artefact-to-artefact consistency without needing the original prompt. Run it first.
+- This task adds the layer that SV-10 cannot cover: requirements that were dropped at the very first translation step (original prompt → intent.md) and therefore do not appear in any project document.
+- In JS projects, Joule generates all artefacts autonomously from the user's prompt. This task is the primary mechanism to verify that Joule's interpretation matched the user's intent.
+
+**Steps:**
+
+1. Ask the user to provide (or paste) their original intent prompt if not already given.
+
+2. Parse the prompt into atomic requirements. For each sentence or clause, extract:
+   - Every entity and its named properties
+   - Every operation or behaviour (verbs: manage, create, send, enforce, calculate, print)
+   - Every constraint (a number limit, a business rule, a formula)
+   - Number each: OI-01, OI-02, ...
+
+3. For each OI item, trace through the artefact chain in order:
+   `intent.md -> PRD -> specification -> schema.cds -> srv/*.js -> UI source`
+   Record the **first layer** at which the item is absent or changed:
+   - **DROPPED**: present in prompt, absent from the first document
+   - **WEAKENED**: scope reduced (e.g. "manage" → "display only")
+   - **CHANGED**: interpretation altered — flag for user to confirm whether correct
+   - **NOT-ENFORCED**: data model exists but business rule not applied at runtime
+   - **PASS**: preserved correctly at all layers
+
+4. Present findings to the user grouped by classification. For each non-PASS item:
+   - DROPPED/WEAKENED: "This was in your original request but was not implemented. Should it be added?"
+   - CHANGED: "This was interpreted as [X]. Did you mean [Y] or is [X] correct?"
+   - NOT-ENFORCED: "The data is stored but the rule is not checked. Should it be enforced?"
+
+5. For items the user confirms as gaps: raise defects, add to the backlog or Clicky suite.
+   For items the user confirms as intentional simplifications: add a note to `specification.md` so the decision is documented for future sessions.
+
+6. Write the original intent prompt verbatim to `specification/original-intent.md` if not already present. This preserves it across sessions and enables future runs of this task without re-pasting.
+
+**Note:** This task requires a user conversation — it cannot be run fully autonomously. If the user does not have the original prompt, run SV-10 instead, which covers all prompt-independent gaps.
+
+
 
 Creates the `testing/` folder and foundational documents in the project root.
 
@@ -289,7 +330,52 @@ Creates the `testing/` folder and foundational documents in the project root.
 2. Create `testing/intent.md` using the format in `testing-protocol.md`
 3. Create `testing/test-plan.md` (initially empty sections, to be filled before first test run)
 4. Create `testing/defects.md` (empty register)
-5. Confirm: "Testing folder initialized. Run 'Generate task suite' next to create Clicky.md."
+5. Create `testing/improvements.md` (empty register — populated by "Generate improvement catalogue" task)
+6. Confirm: "Testing folder initialized. Run 'Generate task suite' next to create Clicky.md."
+
+### Task: Generate improvement catalogue
+
+Produces a structured list of what the skill's proactive rules say should be present but is not. Presented separately from defects after validation completes. No browser required.
+
+**Distinction from defect reporting:**
+- **Defects** (`testing/defects.md`): something is broken — wrong HTTP response, wrong data, crash
+- **Standard violations — Section B** (`testing/improvements.md`): something works but violates a specific ER-N rule in `enterprise-ready.md`. The skill would have generated this correctly if enterprise-ready.md had been loaded before scaffolding.
+- **Enhancements — Section C** (`testing/improvements.md`): something is absent that the write-time checklists say should be present. Not a bug — a gap between what was generated and what the proactive rules define as the target.
+
+**Trigger:** Automatically offered at the end of full validation (step 8). Also available as a standalone task when the user asks "what could be improved?" or "what did the generation miss?"
+
+**Steps:**
+
+1. Load `enterprise-ready.md`. Extract every ER-N rule with its REQUIRED / FORBIDDEN designation.
+
+2. **Section B scan (standard violations):**
+   For each REQUIRED pattern: grep app source or run browser_evaluate. Record PRESENT / ABSENT / PARTIAL.
+   For each FORBIDDEN pattern: check it is absent. Record ABSENT (correct) / PRESENT (violation).
+   Every ABSENT-on-REQUIRED is a Section B violation. Cite the ER-N code.
+   Common high-value checks:
+   - ER-DATA-1: every list filter round-trips to OData `$filter` (not client-side Array.filter)
+   - ER-DATA-3: lists with > 25 rows use `$top`/`$skip` pagination
+   - ER-DATA-5: chart/KPI clicks navigate to filtered list with filter visible in control
+   - ER-UX-1: status/urgency columns use SAP CSS variable tokens for colour, not unstyled text
+   - ER-UX-2: FK fields with >= 2 user-relevant properties render as interactive Popover
+   - ER-TEXT-3: dates shown with locale-aware formatter, not raw ISO string
+
+3. **Section C scan (enhancements from write-time checklists):**
+   Read the per-artifact write-time checklists at the end of `enterprise-ready.md`.
+   For each expected page element (overview/analytics page, detail view for primary entity,
+   cross-navigation onClick on every chart/KPI, FK suggestion input in Create forms,
+   server-side pagination, print-safe report view): check whether the app has it.
+   Every absent element that the checklist says MUST be present is a Section C item.
+
+4. Produce output in two sections. Do NOT include defects (those are already in defects.md).
+
+5. Present: "N standard violations and M enhancement opportunities found. Which to implement?"
+
+6. For approved items: apply fixes, re-run relevant SV checks to verify.
+   For deferred items: write to `testing/improvements.md`.
+
+**Note on JS/JS-LOCAL:** Fully static — no browser required. Can be run when DV is blocked.
+
 
 ### Task: Generate task suite (Clicky.md)
 
@@ -368,19 +454,42 @@ Record PASS / FAIL / N-A for each item. Raise defects to `testing/defects.md`. R
 
 ### Task: Generate human task sheet / Process human test results
 
-**Generate task sheet:**
-1. Read `testing/Clicky.md`
-2. Output a printable task sheet: each task as a plain-language question with answer/ease fields
-3. Present to user: "Here are the test tasks. Please try each in the running app and report back."
+**This is activity 8 — always the last activity.** Human time is the most expensive resource in the validation cycle. The task sheet should only be generated after all automated checks (1-7) are complete and the app is in the best possible state.
+
+**Generate task sheet — sizing questions (ask before generating):**
+
+Ask the user three questions before generating. If running as part of "do 1-8" or the "Complete validation" shortcut, ask them at the point of reaching activity 8. Default answers are shown.
+
+**1. Scope:**
+- **Quick** (5-10 tasks): one task per key entity, most critical user paths. ~15-20 minutes.
+- **Standard** (20-30 tasks, default): all Tier 1 KPI reads, key Tier 2 filters, one Tier 3 detail per entity, primary Tier 4 status transitions. ~45-60 minutes.
+- **Comprehensive** (all Clicky.md tasks): all tiers including Chains and Negatives. ~90-120 minutes.
+
+**2. Tiers to include:**
+- **KPI + actions only** (Tier 1 + Tier 4): fast check of counts and write operations
+- **All read tiers** (Tier 1 + 2 + 3): verifies data is navigable, no write operations required
+- **All tiers** (default): reads, writes, chains, negatives
+
+**3. Answer visibility:**
+- **Blind** (questions only, default): tester does not see the correct answer. Most realistic — detects what is genuinely hard to find.
+- **Guided** (questions + directional hints): tester knows the area to look in but not the exact value. Faster, less realistic.
+
+Default if the user does not answer: Standard / all tiers / blind.
+
+**Generate steps:**
+1. Apply sizing choices: filter `testing/Clicky.md` tasks by scope and tiers.
+2. For each selected task: output the question in plain language. If blind, omit correct answer. If guided, include the view/section but not the exact value.
+3. Format as a printable sheet with answer/ease fields per task.
+4. Present: "Here is the task sheet. Please try each task in the running app and report back your answers and ease ratings."
 
 **Process results:**
 1. User reports answers and ease ratings
-2. Compare answers to correct answers in Clicky.md
+2. Compare each answer against the correct answer in Clicky.md
 3. Record in `testing/DT-usability-human.md`
 4. Raise defects to `testing/defects.md` for wrong or hard-to-find answers
 5. Report: "Human testing: N/N correct. N difficulty issues found."
 
----
+
 
 ## Runtime Verification
 
@@ -388,7 +497,9 @@ Record PASS / FAIL / N-A for each item. Raise defects to `testing/defects.md`. R
 
 The full browser-based verification protocol is in `validation.md` DV-1 through DV-7. Load that file and offer the DV checks after every generation or significant change.
 
-**With Chrome DevTools MCP:** run DV-1 (load), DV-2 (console errors), DV-4 (network), DV-5 (data visibility), DV-7 (interaction) as a minimum. Add DV-6 (task queries) when verifying data correctness. **Also run DV-7b** (all-pages sweep) - navigate every page of the app, not just overview/list. Report pages require an explicit print-preview check (open `Ctrl+Shift+P` and verify all rows visible - not just scroll-to-bottom).
+**With Playwright MCP (preferred):** run DV-1 (load), DV-2 (console errors), DV-4 (network), DV-5 (data visibility), DV-7 (interaction) as a minimum. Add DV-6 (task queries) when verifying data correctness. **Also run DV-7b** (all-pages sweep) - navigate every page of the app, not just overview/list. Report pages require an explicit print-preview check (open `Ctrl+Shift+P` and verify all rows visible - not just scroll-to-bottom).
+
+**With Chrome DevTools MCP (fallback):** same checks using `navigate_page`, `take_screenshot`, `list_console_messages`, `list_network_requests`. Required (not optional) for sap.viz VizFrame chart interaction tests.
 
 **Without Chrome DevTools MCP:** present the user with this checklist and ask them to report back:
 

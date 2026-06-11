@@ -1915,6 +1915,12 @@ list_network_requests() -> find PATCH/POST -> inspect body -> price value must b
 - `testing-protocol.md` - iteration loop and anti-substitution rules for tests
 - `evolution/proposals-2026-05-22.md` - the trial that produced this document (S-PROP-14..38)
 
+**Browser tool note for gate scripts that require a live browser:**
+All gate examples in this file that reference browser tools use generic verbs ("list network requests", "inspect body"). When executing these gates:
+- Use **Playwright MCP** by default: `browser_network_requests`, `browser_network_request`, `browser_evaluate`, `browser_snapshot`
+- Use **Chrome DevTools MCP** only when Playwright is unavailable or for sap.viz VizFrame chart interaction tests
+See `validation.md §DV browser tool selection` for the full rule.
+
 ---
 
 ## Authority calibration - DONE 2026-05-26

@@ -37,6 +37,13 @@ Before writing any UI code, verify every item:
 - [ ] **Correct database file:** Check `package.json -> cds.db.credentials.url` for the project-specific SQLite filename (e.g. `incidents.db`, `bookshop.db`). The default `cds deploy` output is `db.sqlite`. If the project uses a custom name, always run: `npx cds deploy --to sqlite:<filename>.db`. Running `cds deploy` to the wrong file produces a stale schema that silently serves empty or missing columns.
 - [ ] **Server restart after schema changes:** After running `cds deploy`, restart `cds watch` / `cds serve`. If running `cds serve` (not `cds watch`), it does NOT auto-reload on schema changes. Failure to restart causes the server to continue serving the old schema even after deploy succeeds.
 - [ ] **[JS only] Session startup sequence:** `node_modules` are wiped on every Joule Studio sandbox restart. Before starting work in a JS session: run `npm install` first. Also ensure `~/.cds-services.json` exists: `mkdir -p /home/vmuser && echo '{}' > /home/vmuser/.cds-services.json`. See `joule-studio.md §4`.
+- [ ] **Write-path pre-flight (BLOCKING):** For each entity that the UI will create, edit, or delete, verify that a PATCH to a real seed data record succeeds before writing UI code. This catches the cuid UUID-validation trap (§3.2) when seed data uses short IDs.
+  1. `GET <serviceUrl>/<EntitySet>?$top=1` and note the returned `ID` value
+  2. `PATCH <serviceUrl>/<EntitySet>(ID='<that-id>')` with a trivial change (e.g. `{"notes":"test"}` or any non-required field)
+  3. Assert HTTP 200. If HTTP 400 `"does not contain a valid UUID"`: the seed data uses non-UUID IDs but the schema declares `: cuid`. Fix per §3.2 Option A before writing any UI write code.
+  4. Revert the test change (PATCH back the original value, or restart `cds watch` to reload seed data from CSV)
+
+  This pre-flight must pass for ALL writable entities before any UI write code is tested. A list view that reads correctly is NOT evidence that write operations work.
 
 **If any step fails: stop. Fix the CAP backend before generating UI code.**
 
@@ -108,12 +115,28 @@ Books(ID=201,IsActiveEntity=false)/ServiceName.draftActivate
 
 ### 3.2 The `cuid` UUID-validation trap
 
-When a CDS entity is defined as `: cuid, managed`, CAP validates **all** key expressions for that entity as UUID - regardless of what values are actually stored. This affects direct key predicates AND `$filter` on FK fields.
+**The most common source is seed data, not URL construction.**
+
+When seed CSV files use short human-readable IDs (e.g. `ap001`, `w001`, `c001`) for entities declared as `: cuid`, CAP accepts the insert at startup (SQLite does not enforce UUID format on writes) but rejects every subsequent key predicate at runtime with HTTP 400: `"Element 'ID' does not contain a valid UUID"`.
+
+This makes the app effectively read-only: list views (`GET EntitySet` without a key) work because they do not involve a key predicate. Single-record reads and all writes (PATCH, DELETE, POST to navigation) fail.
+
+The trap is silent in a browser test because: (1) the list loads and shows data from the GET, (2) the write button sends a PATCH/DELETE that returns 400, (3) if the catch block only calls `toast()`, the error is brief, (4) the list re-renders from cache showing unchanged data, (5) there is no console error.
+
+Detection: run the write-path pre-flight from §1 before UI testing begins (the PATCH check in the pre-flight checklist).
+
+Fix options (in order of preference):
+- **Option A (correct):** Replace all seed data IDs with UUIDs. Run: `node -e "const {randomUUID}=require('crypto');console.log(randomUUID())"` to generate examples. Update all FK cross-references consistently across all CSV files.
+- **Option B (acceptable for prototypes):** Change the entity key from `: cuid` to a plain `String`. Remove `: cuid` and declare `key ID: String(20) not null`. This disables UUID validation but also disables all `cuid`/`managed` mixin behaviour.
+- **Option C (not recommended):** Add a CAP custom handler that bypasses validation — creates invisible behaviour differences between development and production.
+
+**The validation affects three patterns, not just key predicates:**
 
 ```
-# [X] Both cause HTTP 400 "does not contain a valid UUID":
-Items(ID='short-code')
-$filter=category_ID eq 'short-code'
+# [X] All three cause HTTP 400 "does not contain a valid UUID":
+Items(ID='ap001')                               <- key predicate
+$filter=ID eq 'ap001'                           <- direct ID filter
+$filter=appointment_ID eq 'ap001'               <- FK field filter (D-020 class)
 
 # [OK] Filter by a non-ID string property on the related entity:
 $filter=category/name eq 'Drama'
@@ -123,9 +146,13 @@ $filter=contains(tolower(category/name),'dram')
 # [OK] Plain String key entity (no cuid): works normally
 ```
 
-Check the CDS schema. If the entity has `: cuid, managed`, single-entity fetch by natural key will fail unless the value is a valid UUID.
+**D-020: FK `$filter` expressions are also validated as UUID.**
+`GET /Appointments?$filter=walker_ID eq 'w001'` returns HTTP 400 for the same reason as the key predicate case. Any filter dropdown that passes a seed FK ID value will silently fail. Detection: test a `$filter=<FK_field> eq '<seed-id>'` request directly before writing any filter UI code.
 
-> **`Edm.Guid` metadata but string-valued IDs:** Some CAP projections expose a field as `Edm.Guid` in `` but store short string values (e.g. 2-character codes like `EA`, `GA`). The OData V4 client model tries to format filter values as GUID literals, causing HTTP 400 errors. When this mismatch occurs, filter by a navigation path (`airline/name`) instead of the FK scalar (`airline_ID`). Always test: if `=airline_ID eq 'GA'` returns 400, use `=airline/name eq 'Green Albatros'` or equivalent string navigation property.
+**D-023: Asymmetric POST body FK validation (CAP does NOT validate FK values in POST/PATCH bodies).**
+A POST to create a Dog with body `{"owner_ID": "c001"}` succeeds (HTTP 201) even though `c001` is not a UUID. The record is created with an unresolvable FK. It will appear in list views but `$filter=owner_ID eq 'c001'` will fail (D-020 class) and `$expand=owner` will likely return null. Detection: after any successful POST that includes a FK field, immediately verify the FK can be resolved via `GET /Entity?$filter=FK_ID eq '<created-value>'`.
+
+> **`Edm.Guid` metadata but string-valued IDs:** Some CAP projections expose a field as `Edm.Guid` in `$metadata` but store short string values (e.g. 2-character codes like `EA`, `GA`). The OData V4 client model tries to format filter values as GUID literals, causing HTTP 400 errors. When this mismatch occurs, filter by a navigation path (`airline/name`) instead of the FK scalar (`airline_ID`). Always test: if `$filter=airline_ID eq 'GA'` returns 400, use `$filter=airline/name eq 'Green Albatros'` or equivalent string navigation property.
 
 ### 3.3 String filter functions (verified on CAP SQLite)
 
